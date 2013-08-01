@@ -197,6 +197,14 @@ ALint SoundManager::play(QString fileName, float pitch) {
 	return play(fileName, pitch, 1.0f);
 }
 
+void SoundManager::stop(ALint sourceId) {
+
+	alSourceStop(sourceId);
+	if (alGetError() != AL_NO_ERROR) {
+		reportOpenALError();
+	}
+}
+
 void SoundManager::changePitch(ALint source, float newPitch) {
 
 	alSourcef(source, AL_PITCH, newPitch);

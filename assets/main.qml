@@ -4,36 +4,15 @@ import QtMobility.sensors 1.2
 Page {
     property real pitch: 0.5
     property real heartRate: 0
+    property bool isPlaying: false
 
     Container {
 
         id: mainContainer
 
         background: Color.create("#ffe4e4e4")
-        /*bottomPadding: 50.0
-         * leftPadding: 50.0
-         * topPadding: 50.0
-         * rightPadding: 50.0*/
-
-        //DEBUG STUFF
-        /*Container {
-         * id: debugContainer
-         * visible: false
-         * Label {
-         * id: compassHeadingLabel
-         * text: "Compass heading"
-         * topMargin: 100
-         * rightMargin: 100
-         * }
-         * Label {
-         * id: pitchLabel
-         * text: pitch
-         * leftMargin: 100
-         * }
-         * }*/
 
         Container {
-
             id: topContainer
 
             //background: Color.Green
@@ -54,21 +33,15 @@ Page {
                 layout: DockLayout {
 
                 }
-                
+
                 horizontalAlignment: HorizontalAlignment.Center
 
                 ImageView {
                     id: heartImage
-                    imageSource: "asset:///heart.png"
+                    imageSource: "asset:///images/heart_grey.png"
                     horizontalAlignment: HorizontalAlignment.Center
                     scaleX: 0.9
                     scaleY: 0.9
-
-                    onTouch: {
-                        if (event.isDown()) {
-                            app.playTiger(pitch);
-                        }
-                    }
 
                     animations: [
                         SequentialAnimation {
@@ -87,7 +60,6 @@ Page {
                             }
                         }
                     ]
-
                 }
                 Container {
                     //background: Color.Green
@@ -118,34 +90,55 @@ Page {
                     }
 
                 }
+                
+                onTouch: {
+                    if (touch.isDown()){
+                        
+                        //Connect to the heart rate monitor
+                        app.connectToHRMonitor();
+                    }
+                }
 
             }
-            
+
             Container {
                 id: playerContainer
                 layout: DockLayout {
-                    
+
                 }
-                
+
                 layoutProperties: StackLayoutProperties {
                     spaceQuota: 1.0
                 }
                 ImageView {
-                    imageSource: "asset:///play.png"
+                    imageSource: "asset:///images/play.png"
                     scaleX: 0.85
                     scaleY: 0.85
                     horizontalAlignment: HorizontalAlignment.Center
-
                 }
                 Label {
-                 	id: pitchLabel
-                 	text: ((pitch - 1) * 100).toFixed(0) + "%" 
+                    id: pitchLabel
+                    text: ((pitch - 1) * 100).toFixed(0) + "%"
                     textStyle.color: (pitch < 1) ? Color.Red : Color.Green
                     horizontalAlignment: HorizontalAlignment.Center
                     verticalAlignment: VerticalAlignment.Center
                     textStyle.fontSize: FontSize.XXLarge
                     textStyle.fontWeight: FontWeight.Bold
                     translationX: 25.0
+                }
+
+                onTouch: {
+                    
+                    console.log("player container received touch event");
+                    
+                    if (event.isDown()) {
+                        if (isPlaying) {
+                            app.stopTiger();
+                        } else {
+                            app.playTiger(pitch);
+                        }
+                        isPlaying = !isPlaying;
+                    }
                 }
             }
         }
@@ -161,13 +154,13 @@ Page {
     attachedObjects: [
         Compass {
             id: compass
-            active: true
-            alwaysOn: true
+            active: false
+            alwaysOn: false
             onReadingChanged: {
                 heartRate = reading.azimuth;
                 var newPitch = convertAzimuthToPitch(heartRate);
 
-                if (pitch != newPitch) {
+                if (pitch != newPitch && isPlaying) {
 
                     pitch = newPitch;
                     console.log("Changing pitch");
@@ -181,5 +174,23 @@ Page {
     function convertAzimuthToPitch(azimuth) {
         var pitch = (azimuth * (1.5 / 360)) + 0.5;
         return pitch.toFixed(2);
+    }
+    
+    
+    function logHeartRate(rate) {
+        console.log("XXXX QML has received rate:" + rate);
+        
+        heartRate = rate;
+        var newPitch = convertAzimuthToPitch(rate);
+        
+        console.log("XXXX New pitch is: "+newPitch)
+        
+        if (newPitch != pitch && isPlaying){
+            pitch = newPitch;
+            console.log("Changing pitch");
+            app.changeTigerPitch(pitch);        
+            pulseAnim.play();
+        }
+      
     }
 }

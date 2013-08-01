@@ -1,6 +1,7 @@
 1
-4
-heart.png
+5
+images/heart_grey.png
+images/heart_red.png
+images/play.png
 main.qml
-play.png
 sounds/Tiger.wav

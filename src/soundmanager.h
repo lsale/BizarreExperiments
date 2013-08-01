@@ -65,6 +65,13 @@ public:
   ALint play(QString fileName, float pitch);
 
   /**
+     * Stops a sound
+     *
+     * @param the source id
+     */
+    void stop(ALint sourceId);
+
+  /**
    * Plays a sound, with modified pitch and gain.
    *
    * @param fileName The name of the file in the soundDirectory
