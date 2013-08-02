@@ -5,6 +5,8 @@ Page {
     property real pitch: 0.5
     property real heartRate: 0
     property bool isPlaying: false
+    property bool isConnectedToHRMonitor: false
+    property int targetHeartRate: 140
 
     Container {
 
@@ -38,7 +40,7 @@ Page {
 
                 ImageView {
                     id: heartImage
-                    imageSource: "asset:///images/heart_grey.png"
+                    imageSource: (isConnectedToHRMonitor) ? "asset:///images/heart_red.png" : "asset:///images/heart_grey.png"
                     horizontalAlignment: HorizontalAlignment.Center
                     scaleX: 0.9
                     scaleY: 0.9
@@ -48,15 +50,17 @@ Page {
                             id: pulseAnim
                             ScaleTransition {
                                 fromX: 0.9
-                                toX: 1.0
+                                toX: 0.95
                                 fromY: 0.9
-                                toY: 1.0
+                                toY: 0.95
+                                duration: 100
                             }
                             ScaleTransition {
-                                fromX: 1.0
+                                fromX: 0.95
                                 toX: 0.9
-                                fromY: 1.0
+                                fromY: 0.95
                                 toY: 0.9
+                                duration: 100
                             }
                         }
                     ]
@@ -69,6 +73,7 @@ Page {
                     Label {
                         id: heartRateLabel
                         text: heartRate.toFixed(0)
+                        visible: isConnectedToHRMonitor
                         textStyle.color: Color.Red
                         textStyle.fontSizeValue: 50.0
                         textStyle.fontWeight: FontWeight.Bold
@@ -81,7 +86,8 @@ Page {
 
                     }
                     Label {
-                        text: "120"
+                        text: targetHeartRate
+                        visible: isConnectedToHRMonitor
                         textStyle.fontSize: FontSize.PointValue
                         textStyle.fontSizeValue: 20.0
                         textStyle.color: Color.Green
@@ -90,15 +96,6 @@ Page {
                     }
 
                 }
-                
-                onTouch: {
-                    if (touch.isDown()){
-                        
-                        //Connect to the heart rate monitor
-                        app.connectToHRMonitor();
-                    }
-                }
-
             }
 
             Container {
@@ -118,6 +115,7 @@ Page {
                 }
                 Label {
                     id: pitchLabel
+                    visible: isPlaying
                     text: ((pitch - 1) * 100).toFixed(0) + "%"
                     textStyle.color: (pitch < 1) ? Color.Red : Color.Green
                     horizontalAlignment: HorizontalAlignment.Center
@@ -144,7 +142,8 @@ Page {
         }
 
         Label {
-            text: (heartRate < 120) ? "Too slow" : "Slow down!"
+            text: (heartRate < targetHeartRate) ? "Too slow" : "Nice work - keep it up!"
+            visible: isPlaying && isConnectedToHRMonitor
             textStyle.base: SystemDefaults.TextStyles.BigText
             horizontalAlignment: HorizontalAlignment.Center
             verticalAlignment: VerticalAlignment.Bottom
@@ -176,20 +175,28 @@ Page {
         return pitch.toFixed(2);
     }
     
+    function convertHeartRateToPitch(rate){
+        
+        return ((1/targetHeartRate) * rate).toFixed(2);
+    }
+    
     
     function logHeartRate(rate) {
         console.log("XXXX QML has received rate:" + rate);
+        if (!isConnectedToHRMonitor) isConnectedToHRMonitor = true;
         
+        pulseAnim.play();
         heartRate = rate;
-        var newPitch = convertAzimuthToPitch(rate);
         
+        //Calculate the music pitch
+        var newPitch = convertHeartRateToPitch(rate);
+                
         console.log("XXXX New pitch is: "+newPitch)
         
         if (newPitch != pitch && isPlaying){
-            pitch = newPitch;
             console.log("Changing pitch");
+            pitch = newPitch;
             app.changeTigerPitch(pitch);        
-            pulseAnim.play();
         }
       
     }

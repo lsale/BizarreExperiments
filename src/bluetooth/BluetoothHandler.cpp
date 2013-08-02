@@ -331,13 +331,13 @@ BluetoothHandler::~BluetoothHandler() {
 	bt_gatt_deinit();
 }
 
-void BluetoothHandler::receiveHrNotifications() {
+bool BluetoothHandler::receiveHrNotifications() {
 
 	qDebug() << "YYYY setting up to receive GATT notifications";
 
 	if (!bt_initialised) {
 		qDebug() << "Bluetooth libraries are not initialised!";
-		return;
+		return false;
 	}
 
 	HrDataContainer* hrdc = HrDataContainer::getInstance();
@@ -355,8 +355,10 @@ void BluetoothHandler::receiveHrNotifications() {
 
 	if (bt_gatt_connect_service(device_addr.toAscii().constData(), HR_SERVICE_UUID, NULL, &conParm, this) < 0) {
 		qDebug() << "YYYY GATT connect service request failed: " + QString::number(errno) + " (" + QString(strerror(errno)) + ")";
+		return false;
 	} else {
 		qDebug() << "YYYY requested connection to HR service OK";
+		return true;
 	}
 
 }

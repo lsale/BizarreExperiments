@@ -7,6 +7,9 @@
 #include <bb/cascades/Window>
 #include <bb/cascades/DataModel>
 
+#include <qdebug.h>
+#include <pthread.h>
+#include <errno.h>
 
 using namespace bb::cascades;
 
@@ -16,17 +19,35 @@ ApplicationUI::ApplicationUI(bb::cascades::Application *app) :
 	//Stop the screen from timing out
 	app->mainWindow()->setScreenIdleMode(ScreenIdleMode::KeepAwake);
 
-	// prepare the localization
-	m_pTranslator = new QTranslator(this);
-	m_pLocaleHandler = new LocaleHandler(this);
-	if (!QObject::connect(m_pLocaleHandler, SIGNAL(systemLanguageChanged()),
-			this, SLOT(onSystemLanguageChanged()))) {
-		// This is an abnormal situation! Something went wrong!
-		// Add own code to recover here
-		qWarning() << "Recovering from a failed connect()";
+	//Read the current scheduling parameters
+	sched_param schedParam;
+	int policy;
+	int getParamsResult = pthread_getschedparam(pthread_self(), &policy,
+			&schedParam);
+
+	if (getParamsResult == EOK) {
+		qDebug() << getSchedulingPolicyDescription(policy);
 	}
-	// initial load
-	onSystemLanguageChanged();
+
+	//Change the thread scheduling policy to FIFO
+	int setScheduleResult = pthread_setschedparam(pthread_self(), SCHED_FIFO,
+			&schedParam);
+	if (setScheduleResult == EOK) {
+		qDebug() << "Set scheduler to FIFO";
+	} else {
+		qDebug() << "Error setting scheduling policy to FIFO. Error: "
+				<< setScheduleResult;
+	}
+
+	//Change the thread priority to the maximum permissible
+	int priorityResult = pthread_setschedprio(pthread_self(), 63);
+
+	if (priorityResult == EOK) {
+		qDebug() << "Successfully set new thread priority";
+	} else {
+		qDebug() << "Failed to set new thread priority. Result: "
+				<< priorityResult;
+	}
 
 	//Set up bluetooth
 	m_pBluetoothHandler = new BluetoothHandler(app);
@@ -37,7 +58,7 @@ ApplicationUI::ApplicationUI(bb::cascades::Application *app) :
 	QVariantList indexPath;
 	indexPath << 0;
 
-	if (pHRDevices->hasChildren(indexPath)){
+	if (pHRDevices->hasChildren(indexPath)) {
 
 		qDebug() << "YYYY Found one or more Heart Rate monitors";
 
@@ -45,7 +66,7 @@ ApplicationUI::ApplicationUI(bb::cascades::Application *app) :
 
 		//get the first bluetooth device
 		indexPath << 0;
-		QMap<QString,QVariant> hrDevice = pHRDevices->data(indexPath).toMap();
+		QMap<QString, QVariant> hrDevice = pHRDevices->data(indexPath).toMap();
 
 		QString deviceAddress = hrDevice.value("deviceAddress").toString();
 		QString deviceName = hrDevice.value("deviceName").toString();
@@ -54,8 +75,8 @@ ApplicationUI::ApplicationUI(bb::cascades::Application *app) :
 
 		monitorHeartRate(deviceAddress, deviceName);
 
-		QObject::connect(hrdc, SIGNAL(heartRateData(QVariant)), this, SLOT(logHeartRate(QVariant)), Qt::QueuedConnection);
-
+		QObject::connect(hrdc, SIGNAL(heartRateData(QVariant)), this,
+				SLOT(logHeartRate(QVariant)), Qt::QueuedConnection);
 
 	} else {
 
@@ -65,7 +86,6 @@ ApplicationUI::ApplicationUI(bb::cascades::Application *app) :
 	//Create the sound manager
 	m_pSoundManager = new SoundManager("sounds/");
 	m_tigerSourceId = 0;
-
 
 	//INITIALISE THE UI
 
@@ -81,10 +101,10 @@ ApplicationUI::ApplicationUI(bb::cascades::Application *app) :
 	app->setScene(m_pRoot);
 }
 
-ApplicationUI::~ApplicationUI(){
+ApplicationUI::~ApplicationUI() {
 
 	//Clean up the sound manager
-	delete(m_pSoundManager);
+	delete (m_pSoundManager);
 	m_pSoundManager = 0;
 }
 
@@ -95,19 +115,24 @@ void ApplicationUI::monitorHeartRate(QString device_addr, QString device_name) {
 	hrdc->setCurrentDeviceAddr(device_addr);
 	hrdc->setCurrentDeviceName(device_name);
 
-	_future = new QFuture<void>;
-	_watcher = new QFutureWatcher<void>;
+	_future = new QFuture<bool>;
+	_watcher = new QFutureWatcher<bool>;
 	qDebug() << "YYYY locking notification receiver thread mutex";
 	_mutex.lock();
 	qDebug() << "YYYY notification receiver thread mutex locked OK";
-	*_future = QtConcurrent::run(m_pBluetoothHandler, &BluetoothHandler::receiveHrNotifications);
+	*_future = QtConcurrent::run(m_pBluetoothHandler,
+			&BluetoothHandler::receiveHrNotifications);
 	_watcher->setFuture(*_future);
-	QObject::connect(_watcher, SIGNAL(finished()), this, SLOT(finishedReceiving()));
+	QObject::connect(_watcher, SIGNAL(finished()), this,
+			SLOT(finishedReceiving()));
 
 }
 
 void ApplicationUI::finishedReceiving() {
 	qDebug() << "YYYY notification receiver thread has finished running";
+	qDebug() << "YYYY notification receiver thread result: "
+			<< _future->result();
+
 	_mutex.unlock();
 }
 
@@ -134,23 +159,42 @@ void ApplicationUI::playTiger(float pitch) {
 void ApplicationUI::stopTiger() {
 
 	//stop the song playing
-	if (isTigerPlaying()){
+	if (isTigerPlaying()) {
 		m_pSoundManager->stop(m_tigerSourceId);
 		m_tigerSourceId = 0;
 	}
 }
 
-bool ApplicationUI::isTigerPlaying(){
+bool ApplicationUI::isTigerPlaying() {
 
 	return (m_tigerSourceId != 0);
 }
 
-void ApplicationUI::connectToHRMonitor(){
-
+void ApplicationUI::connectToHRMonitor() {
 
 }
 
-void ApplicationUI::changeTigerPitch(float newPitch){
+void ApplicationUI::changeTigerPitch(float newPitch) {
 
 	m_pSoundManager->changePitch(m_tigerSourceId, newPitch);
 }
+
+QString ApplicationUI::getSchedulingPolicyDescription(const int policy) {
+
+	QString policyName;
+
+	switch (policy) {
+	case SCHED_FIFO:
+		policyName = "FIFO";
+		break;
+	case SCHED_RR:
+		policyName = "RR";
+		break;
+	default:
+		policyName = policy;
+		break;
+	}
+
+	return policyName;
+}
+

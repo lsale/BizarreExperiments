@@ -43,8 +43,8 @@ private:
 
 	//Heart rate stuff
 	BluetoothHandler* m_pBluetoothHandler;
-	QFuture<void> *_future;
-	QFutureWatcher<void> *_watcher;
+	QFuture<bool> *_future;
+	QFutureWatcher<bool> *_watcher;
 	QMutex _mutex;
 
 	//Sound stuff
@@ -53,6 +53,9 @@ private:
 
 	//UI
 	bb::cascades::AbstractPane* m_pRoot;
+
+	//Utilities
+	QString getSchedulingPolicyDescription(const int policy);
 };
 
 #endif /* ApplicationUI_HPP_ */
