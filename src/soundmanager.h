@@ -31,44 +31,82 @@
  *
  * A very basic sound manager class for playing sounds using OpenAL library.
  */
-class SoundManager
-{
+class SoundManager {
 public:
 
-  /**
-   * This is our constructor which initializes the sound manager.
-   *
-   */
-  SoundManager();
+	/**
+	 * This is our constructor which initializes the sound manager.
+	 *
+	 */
+	SoundManager();
 
-  /**
-   * This is our destructor which destroys all buffers and sources.
-   */
-  ~SoundManager();
+	/**
+	 * This is our destructor which destroys all buffers and sources.
+	 */
+	~SoundManager();
 
-  /**
-   * Load a sound
-   *
-   * @return bufferId
-   */
-  ALuint load(QString filePath);
+	/**
+	 * Load a WAV file, preparing it for playback
+	 *
+	 * @return true if loading was success, false if not
+	 */
+	bool load(QString filePath);
 
-  /**
-   * Plays a sound, with modified pitch and gain.
-   *
-   * @param bufferId The ID of the buffer we wish to play, obtained using load
-   * @param pitch Specifies the pitch to be applied to a sound Range: [0.5-2.0]
-   * @param gain Sound gain (volume amplification) Range: ]0.0-  ]
-   */
-  bool play(ALuint bufferId, float pitch, float gain);
+	/**
+	 * Plays a sound, with modified pitch and gain.
+	 *
+	 * @param filePath Path of file we wish to play, must have been loaded first using @see load
+	 * @param pitch Specifies the pitch to be applied to a sound Range: [0.5-2.0]
+	 * @param gain Sound gain (volume amplification)
+	 * @return true if buffer is able to be played
+	 */
+	bool play(QString filePath, float pitch, float gain);
+
+	/**
+	 * Stop playing the specified sound
+	 *
+	 * @param filePath Path of file we wish to stop playing
+	 *
+	 */
+	bool stop(QString filePath);
+
+	bool setPitch(QString filePath, float newPitch);
+
+	bool playSquareTone();
 
 private:
 
-  // Sound sources
-  ALuint mSoundSourceIds[SOUNDMANAGER_MAX_NBR_OF_SOURCES];
+	// Sound buffers (Key: filename, Value: bufferId)
+	QHash<QString, ALuint> mSoundBuffers;
 
-  // Map of buffers which have been attached to sources. Key: bufferId, value: sourceId
-  QHash<ALuint,ALuint> mAttachedSourceIds;
+	// Sound sources
+	ALuint mSourceIds[SOUNDMANAGER_MAX_NBR_OF_SOURCES];
+
+	// Map of buffers which have been attached to sources. Key: bufferId, value: sourceId
+	QHash<ALuint, ALuint> mAttachedSourceIds;
+
+	/**
+	 * Gets the next available source ID.
+	 *
+	 * @return sourceId
+	 */
+	ALuint getNextAvailableSourceId();
+
+	/**
+	 * Attach a buffer to a source.
+	 *
+	 * @param bufferId the ID of the buffer
+	 * @param sourceId the ID of the source
+	 */
+	bool attachBufferToSource(ALuint bufferId, ALuint sourceId);
+
+	/**
+	 * Play the given source
+	 *
+	 * @param sourceId the ID of the source
+	 */
+	bool playSource(ALuint sourceId, float pitch, float gain, bool shouldLoop);
+
 
 };
 
