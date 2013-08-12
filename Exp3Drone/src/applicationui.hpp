@@ -3,16 +3,17 @@
 
 #include <QObject>
 
+#include "DroneController.h"
+#include "GamePadListener.h"
+
 namespace bb
 {
     namespace cascades
     {
         class Application;
-        class LocaleHandler;
+
     }
 }
-
-class QTranslator;
 
 /*!
  * @brief Application object
@@ -25,12 +26,12 @@ class ApplicationUI : public QObject
     Q_OBJECT
 public:
     ApplicationUI(bb::cascades::Application *app);
-    virtual ~ApplicationUI() { }
+    virtual ~ApplicationUI();
 private slots:
-    void onSystemLanguageChanged();
 private:
-    QTranslator* m_pTranslator;
-    bb::cascades::LocaleHandler* m_pLocaleHandler;
+
+	DroneController* m_pDroneController;
+	GamePadListener* m_pGamePadListener;
 };
 
 #endif /* ApplicationUI_HPP_ */

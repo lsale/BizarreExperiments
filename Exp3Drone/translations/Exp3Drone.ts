@@ -4,8 +4,8 @@
 <context>
     <name>main</name>
     <message>
-        <location filename="../assets/main.qml" line="8"/>
-        <source>Hello World</source>
+        <location filename="../assets/main.qml" line="10"/>
+        <source>AR Drone</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
