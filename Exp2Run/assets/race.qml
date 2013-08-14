@@ -4,9 +4,14 @@ import bb.multimedia 1.0
 
 Page {
     property int counter: 10
+    property int decrement: 10
     property bool shoot
     property int lap
     property bool victory: true
+    function decrementCounter(){
+        if (decrement>3)
+        	decrement--        	 
+    }
     Container {
         background: (shoot) ? Color.Red : Color.Black
         Label {
@@ -84,7 +89,7 @@ Page {
                     shoot = true 
                     siren.play()
                     resetter.start()
-                    counter = 10
+                    counter = decrement;
                 }
             }
             attachedObjects: [
@@ -107,8 +112,9 @@ Page {
         }
     }
     onLapChanged: {
-        if(lap<10){
-            counter = 10
+        if(lap<10 && decrement>0){
+            decrementCounter()
+            counter = decrement
             if(!shoot)
                 yay.play()
         }else{
@@ -122,6 +128,13 @@ Page {
         MediaPlayer {
             id: yay
             sourceUrl: "res/yay.wav"
+        },
+        MediaPlayer {
+            id: bennyHill
+            sourceUrl: "res/benny.mp3"
         }
     ]
+    onCreationCompleted: {
+        bennyHill.play()
+    }
 }

@@ -63,6 +63,8 @@ NavigationPane {
                     spaceQuota: 1.0
                 
                 }
+                multiline: true
+                textStyle.textAlign: TextAlign.Center
             }
             Label {
                 id: countdown
