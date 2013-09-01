@@ -1,34 +1,24 @@
-// Default empty project template
 #include <bb/cascades/Application>
-#include <bb/cascades/QmlDocument>
-#include <bb/cascades/AbstractPane>
 
 #include <QLocale>
 #include <QTranslator>
+#include "applicationui.hpp"
+#include "webserver.hpp"
+
 #include <Qt/qdeclarativedebug.h>
-#include "Exp5Game.hpp"
 
 using namespace bb::cascades;
 
-void myMessageOutput(QtMsgType type, const char* msg) {
-
-	Q_UNUSED(type);
-	fprintf(stdout, "%s\n", msg);
-	fflush(stdout);
-}
-
 Q_DECL_EXPORT int main(int argc, char **argv)
 {
-
-	qInstallMsgHandler(myMessageOutput);
-	qDebug() << "Starting Experiment 5 - Let the games commence!!";
-
-	// this is where the server is started etc
     Application app(argc, argv);
+    // Create the Application UI object, this is where the main.qml file
+    // is loaded and the application scene is set.
+    ApplicationUI* myApp = new ApplicationUI(&app);
 
-    new Exp5Game(&app);
+    //Create web server
+    new WebServer(myApp);
 
-    // we complete the transaction started in the app constructor and start the client event loop here
+    // Enter the application main event loop.
     return Application::exec();
-    // when loop is exited the Application deletes the scene which deletes all its children (per qt rules for children)
 }

@@ -1,1 +1,0 @@
-include (../TugOfWar.pro)

@@ -3,32 +3,32 @@ BASEDIR =  $$quote($$_PRO_FILE_PWD_)
 
 device {
     CONFIG(debug, debug|release) {
-        SOURCES +=  $$quote($$BASEDIR/src/Exp5Game.cpp) \
-                 $$quote($$BASEDIR/src/GameServer.cpp) \
-                 $$quote($$BASEDIR/src/main.cpp)
+        SOURCES +=  $$quote($$BASEDIR/src/applicationui.cpp) \
+                 $$quote($$BASEDIR/src/main.cpp) \
+                 $$quote($$BASEDIR/src/webserver.cpp)
 
-        HEADERS +=  $$quote($$BASEDIR/src/Exp5Game.hpp) \
-                 $$quote($$BASEDIR/src/GameServer.hpp)
+        HEADERS +=  $$quote($$BASEDIR/src/applicationui.hpp) \
+                 $$quote($$BASEDIR/src/webserver.hpp)
     }
 
     CONFIG(release, debug|release) {
-        SOURCES +=  $$quote($$BASEDIR/src/Exp5Game.cpp) \
-                 $$quote($$BASEDIR/src/GameServer.cpp) \
-                 $$quote($$BASEDIR/src/main.cpp)
+        SOURCES +=  $$quote($$BASEDIR/src/applicationui.cpp) \
+                 $$quote($$BASEDIR/src/main.cpp) \
+                 $$quote($$BASEDIR/src/webserver.cpp)
 
-        HEADERS +=  $$quote($$BASEDIR/src/Exp5Game.hpp) \
-                 $$quote($$BASEDIR/src/GameServer.hpp)
+        HEADERS +=  $$quote($$BASEDIR/src/applicationui.hpp) \
+                 $$quote($$BASEDIR/src/webserver.hpp)
     }
 }
 
 simulator {
     CONFIG(debug, debug|release) {
-        SOURCES +=  $$quote($$BASEDIR/src/Exp5Game.cpp) \
-                 $$quote($$BASEDIR/src/GameServer.cpp) \
-                 $$quote($$BASEDIR/src/main.cpp)
+        SOURCES +=  $$quote($$BASEDIR/src/applicationui.cpp) \
+                 $$quote($$BASEDIR/src/main.cpp) \
+                 $$quote($$BASEDIR/src/webserver.cpp)
 
-        HEADERS +=  $$quote($$BASEDIR/src/Exp5Game.hpp) \
-                 $$quote($$BASEDIR/src/GameServer.hpp)
+        HEADERS +=  $$quote($$BASEDIR/src/applicationui.hpp) \
+                 $$quote($$BASEDIR/src/webserver.hpp)
     }
 }
 

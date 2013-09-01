@@ -1,4 +1,4 @@
-QMAKE_TARGET  = TugOfWar
+QMAKE_TARGET  = Exp5Game
 LUPDATE       = $(QNX_HOST)/usr/bin/lupdate
 LRELEASE      = $(QNX_HOST)/usr/bin/lrelease
 
