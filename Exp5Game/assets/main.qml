@@ -1,9 +1,9 @@
 import bb.cascades 1.0
-import bb.multimedia 1.0
+//import bb.multimedia 1.0
 
 Page {
-    property int dScore: 0
-    property int lScore: 0
+    property int dScore: 10
+    property int lScore: 10
     property int maxScore: 30
     property int globalPosition: (dScore-lScore)*10
     onDScoreChanged: {
@@ -52,13 +52,15 @@ Page {
                 }
             }
             Container {
-                
+                background: Color.Red
                 layout: StackLayout {
                     orientation: LayoutOrientation.LeftToRight
                 
                 }
                 Container {
+                    background: Color.Blue
                     id: left
+                    
                     layoutProperties: StackLayoutProperties {
                         spaceQuota: 2.0
                     }
@@ -69,13 +71,13 @@ Page {
                         textStyle.fontSizeValue: 200
                         horizontalAlignment: HorizontalAlignment.Center
                     }
-                
                 }
                 Container {
+                    background: Color.Yellow
                     id: center
                     topPadding: 70.0
                     layoutProperties: StackLayoutProperties {
-                        spaceQuota: 1.0
+                        spaceQuota: -1.0
                     }
                     layout: StackLayout {
                         orientation: LayoutOrientation.LeftToRight
@@ -86,7 +88,7 @@ Page {
                         textStyle.color: Color.White
                         textStyle.fontSize: FontSize.PercentageValue
                         textStyle.fontSizeValue: 400
-                        horizontalAlignment: HorizontalAlignment.Center
+                        horizontalAlignment: HorizontalAlignment.Fill
                     }
                     Label {
                         text: ":"
@@ -198,11 +200,11 @@ Page {
             }
         }
         attachedObjects: [
-            MediaPlayer{
+            /*MediaPlayer{
                 id: ohBoy
                 sourceUrl: "asset:///ohmygod.mp3"
                 
-            }
+            }*/
         ]
     }
     
