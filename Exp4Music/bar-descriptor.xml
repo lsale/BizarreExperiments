@@ -54,19 +54,6 @@
     <!--  Name of author which is used for signing. Must match the developer name of your development certificate. -->
     <author>Example Inc.</author>
     <platformVersion>10.0.0.0</platformVersion>
-    
-    <!--  Unique author ID assigned by signing authority. Required if using debug tokens. -->
-    <!-- <authorId>ABC1234YjsnUk235h</authorId> -->
-   
-    <initialWindow>
-        <aspectRatio>portrait</aspectRatio>
-        <autoOrients>false</autoOrients>
-        <systemChrome>none</systemChrome>
-        <transparent>false</transparent>
-    </initialWindow>
-    
-    <!--  The category where the application appears. Either core.games or core.media. -->
-    <category>core.games</category>
     <configuration name="Device-Debug">
        <platformArchitecture>armle-v7</platformArchitecture>
        <asset path="arm/o.le-v7-g/Exp4Music" entry="true" type="Qnx/Elf">Exp4Music</asset>
@@ -85,6 +72,16 @@
        <asset path="x86/o-g/Exp4Music" entry="true" type="Qnx/Elf">Exp4Music</asset>
     </configuration>
     
+    <!--  Unique author ID assigned by signing authority. Required if using debug tokens. -->
+    <!-- <authorId>ABC1234YjsnUk235h</authorId> -->
+   
+    <initialWindow>
+        <aspectRatio>landscape</aspectRatio>
+        <autoOrients>false</autoOrients>
+        <systemChrome>none</systemChrome>
+        <transparent>false</transparent>
+    </initialWindow>
+    
     <!--  The icon for the application, which should be 114x114. -->
     <icon>
         <image>icon.png</image>
@@ -100,8 +97,8 @@
     
     <!-- Request permission to execute native code.  Required for native applications. -->
     <permission system="true">run_native</permission>
-    <permission>record_audio</permission>
     <permission>access_shared</permission>
+    <permission>record_audio</permission>
     <env var="LD_LIBRARY_PATH" value="app/native/lib:/usr/lib/qt4/lib"/>
 
 </qnx>

@@ -4,8 +4,7 @@
 #include "soundmanager.h"
 
 #include <QObject>
-#include <bb/cascades/Label>
-
+#include <QTimer>
 
 namespace bb
 {
@@ -15,8 +14,6 @@ namespace bb
     }
 }
 
-using namespace bb::cascades;
-
 class ApplicationUI : public QObject
 {
     Q_OBJECT
@@ -24,21 +21,20 @@ public:
     ApplicationUI(bb::cascades::Application *app);
     virtual ~ApplicationUI();
 
-    Q_INVOKABLE void loadSound();
-    Q_INVOKABLE void playSound();
-    Q_INVOKABLE void stopSound();
-    Q_INVOKABLE void setPitch(float newPitch);
-    Q_INVOKABLE void playTone();
+    Q_INVOKABLE void playBass(float pitch);
+    Q_INVOKABLE void loadDrum();
+    Q_INVOKABLE void startDrum();
+    Q_INVOKABLE void stopDrum();
 
 private slots:
-
+	void playDrum();
 private:
 
 	SoundManager* m_pSoundManager;
-	Label* m_pDebugLabel;
+	QString mBassPath;
+	QTimer* m_pDrumTimer;
 
-	void setDebugText(QString debugText);
-
+	QString getSchedulingPolicyDescription(const int policy);
 };
 
 #endif /* ApplicationUI_HPP_ */

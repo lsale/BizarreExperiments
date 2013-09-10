@@ -13,18 +13,17 @@ Page {
         id: mainContainer
 
         background: Color.create("#ffe4e4e4")
-
+        
         Container {
             id: topContainer
 
-            //background: Color.Green
+            //background: Color.Blue
             layout: StackLayout {
                 orientation: LayoutOrientation.LeftToRight
 
             }
             horizontalAlignment: HorizontalAlignment.Fill
-            verticalAlignment: VerticalAlignment.Fill
-
+            
             //Heart rate
             Container {
 
@@ -140,41 +139,51 @@ Page {
                 }
             }
         }
-
-        Label {
-            text: (heartRate < targetHeartRate) ? "Too slow" : "Nice work - keep it up!"
+        Container {
+            //background: Color.Green
+            topPadding: 20
+            leftPadding: 20
+            rightPadding: 20
+            bottomPadding: 20
+            
             visible: isPlaying && isConnectedToHRMonitor
-            textStyle.base: SystemDefaults.TextStyles.BigText
-            horizontalAlignment: HorizontalAlignment.Center
-            verticalAlignment: VerticalAlignment.Bottom
-        }
-    }
-
-    attachedObjects: [
-        Compass {
-            id: compass
-            active: false
-            alwaysOn: false
-            onReadingChanged: {
-                heartRate = reading.azimuth;
-                var newPitch = convertAzimuthToPitch(heartRate);
-
-                if (pitch != newPitch && isPlaying) {
-
-                    pitch = newPitch;
-                    console.log("Changing pitch");
-                    app.changeTigerPitch(pitch);
-                    pulseAnim.play();
+            
+            layout: StackLayout {
+                orientation: LayoutOrientation.LeftToRight
+            }
+            
+            layoutProperties: StackLayoutProperties {
+                spaceQuota: 1
+            }
+            Button {
+                text: "Decrease target"
+                verticalAlignment: VerticalAlignment.Center
+                onClicked: {
+                    targetHeartRate--;
                 }
             }
+            
+            Label {
+                text: (heartRate < targetHeartRate) ? "Too slow" : "Good job!"
+                textStyle.base: SystemDefaults.TextStyles.BigText
+                horizontalAlignment: HorizontalAlignment.Center
+                verticalAlignment: VerticalAlignment.Center
+                layoutProperties: StackLayoutProperties {
+                    spaceQuota: 1
+                }
+                textStyle.textAlign: TextAlign.Center
+            }
+            Button {
+                text: "Increase target"
+                verticalAlignment: VerticalAlignment.Center    
+                onClicked: {
+                    targetHeartRate++;
+                }        
+            }
+        
         }
-    ]
-
-    function convertAzimuthToPitch(azimuth) {
-        var pitch = (azimuth * (1.5 / 360)) + 0.5;
-        return pitch.toFixed(2);
     }
-    
+        
     function convertHeartRateToPitch(rate){
         
         return ((1/targetHeartRate) * rate).toFixed(2);

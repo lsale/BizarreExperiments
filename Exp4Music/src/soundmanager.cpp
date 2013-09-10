@@ -153,7 +153,7 @@ bool SoundManager::play(QString filePath, float pitch, float gain) {
 	ALuint bufferId = mSoundBuffers[filePath];
 	ALuint sourceId = mAttachedSourceIds[bufferId];
 
-	return playSource(sourceId, pitch, gain, true);
+	return playSource(sourceId, pitch, gain, false);
 }
 
 bool SoundManager::stop(QString filePath) {
