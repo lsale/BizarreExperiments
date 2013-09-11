@@ -1,4 +1,4 @@
-QMAKE_TARGET  = RunDonRun
+QMAKE_TARGET  = Exp2Run
 LUPDATE       = $(QNX_HOST)/usr/bin/lupdate
 LRELEASE      = $(QNX_HOST)/usr/bin/lrelease
 

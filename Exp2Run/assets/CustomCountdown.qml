@@ -4,6 +4,7 @@ Container {
     background: Color.Transparent
     property int number
     property variant textColor: Color.White
+    property bool isFireScreenOn: false 
     layout: DockLayout {
     }
     Label {
@@ -21,7 +22,7 @@ Container {
         }else if(number>3){
             textColor = Color.Yellow            
         }else {
-            textColor = Color.Red
+            textColor = (isFireScreenOn) ? Color.White : Color.Red
         }
     }
 }

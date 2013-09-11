@@ -26,33 +26,50 @@
 
     <!-- A universally unique application identifier. Must be unique across all BlackBerry 10 applications.
          Using a reverse DNS-style name as the id is recommended. (Eg. com.example.ExampleApplication.) Required. -->
-    <id>com.example.RunDonRun</id>
+    <id>com.example.Exp2Run</id>
 
     <!-- The name that is displayed in the BlackBerry 10 application installer. 
          May have multiple values for each language. See samples or xsd schema file. Optional. -->
-    <name>RunDonRun</name>
+    <name>Exp2Run</name>
     
     <!-- A string value of the format <0-999>.<0-999>.<0-999> that represents application version which can be used to check for application upgrade. 
          Values can also be 1-part or 2-part. It is not necessary to have a 3-part value.
          An updated version of application must have a versionNumber value higher than the previous version. Required. -->
     <versionNumber>1.0.0</versionNumber>
+    <buildId>1</buildId>
 
     <!-- Fourth digit segment of the package version. First three segments are taken from the 
          <versionNumber> element.  Must be an integer from 0 to 2^16-1 -->
-    <buildId>1</buildId>
                  
     <!-- A string value (such as "v1", "2.5", or "Alpha 1") that represents the version of the application, as it should be shown to users. Optional. -->
     <!-- <versionLabel></versionLabel> -->
 
     <!-- Description, displayed in the BlackBerry 10 application installer.
          May have multiple values for each language. See samples or xsd schema file. Optional. -->
-    <description>The RunDonRun application</description>
+    <description>The Exp2Run application</description>
 
     <!-- Copyright information. Optional. -->
     <!-- <copyright></copyright> -->
 
     <!--  Name of author which is used for signing. Must match the developer name of your development certificate. -->
     <author>Example Inc.</author>
+    <configuration name="Device-Debug">
+       <platformArchitecture>armle-v7</platformArchitecture>
+       <asset path="arm/o.le-v7-g/Exp2Run" entry="true" type="Qnx/Elf">Exp2Run</asset>
+    </configuration>
+    <configuration name="Device-Release">
+       <entryPointType>Qnx/Cascades</entryPointType>
+       <platformArchitecture>armle-v7</platformArchitecture>
+       <asset path="arm/o.le-v7/Exp2Run.so" entry="true" type="Qnx/Elf">Exp2Run.so</asset>
+    </configuration>
+    <configuration name="Device-Profile">
+       <platformArchitecture>armle-v7</platformArchitecture>
+       <asset path="arm-p/o.le-v7-g/Exp2Run" entry="true" type="Qnx/Elf">Exp2Run</asset>
+    </configuration>
+    <configuration name="Simulator-Debug">
+       <platformArchitecture>x86</platformArchitecture>
+       <asset path="x86/o-g/Exp2Run" entry="true" type="Qnx/Elf">Exp2Run</asset>
+    </configuration>
     
     <!--  Unique author ID assigned by signing authority. Required if using debug tokens. -->
     <!-- <authorId>ABC1234YjsnUk235h</authorId> -->
@@ -62,26 +79,6 @@
         <systemChrome>none</systemChrome>
         <transparent>false</transparent>
     </initialWindow>
-    
-    <!--  The category where the application appears. Either core.games or core.media. -->
-    <category>core.games</category>
-    <configuration name="Device-Debug">
-       <platformArchitecture>armle-v7</platformArchitecture>
-       <asset path="arm/o.le-v7-g/RunDonRun" entry="true" type="Qnx/Elf">RunDonRun</asset>
-    </configuration>
-    <configuration name="Device-Release">
-       <entryPointType>Qnx/Cascades</entryPointType>
-       <platformArchitecture>armle-v7</platformArchitecture>
-       <asset path="arm/o.le-v7/RunDonRun.so" entry="true" type="Qnx/Elf">RunDonRun.so</asset>
-    </configuration>
-    <configuration name="Device-Profile">
-       <platformArchitecture>armle-v7</platformArchitecture>
-       <asset path="arm-p/o.le-v7-g/RunDonRun" entry="true" type="Qnx/Elf">RunDonRun</asset>
-    </configuration>
-    <configuration name="Simulator-Debug">
-       <platformArchitecture>x86</platformArchitecture>
-       <asset path="x86/o-g/RunDonRun" entry="true" type="Qnx/Elf">RunDonRun</asset>
-    </configuration>
     
     <!--  The icon for the application, which should be 114x114. -->
     <icon>
@@ -101,12 +98,12 @@
     <env var="LD_LIBRARY_PATH" value="app/native/lib:/usr/lib/qt4/lib"/>
 
 	<!-- Invoke the app through NFC -->
-	<invoke-target id="com.example.NfcRaceTimeWay">
+	<invoke-target id="com.example.NfcRunDonRun">
     <type>APPLICATION</type>
-    <filter>
-        <action>bb.action.OPEN</action>
-        <mime-type>application/vnd.rim.nfc.ndef</mime-type>
-        <property var="uris" value="ndef://4/my.bb.com/myrecordtype"/>
-    </filter>
-</invoke-target>
+	    <filter>
+	        <action>bb.action.OPEN</action>
+	        <mime-type>application/vnd.rim.nfc.ndef</mime-type>
+	        <property var="uris" value="ndef://4/my.bb.com/myrecordtype"/>
+	    </filter>
+	</invoke-target>
 </qnx>

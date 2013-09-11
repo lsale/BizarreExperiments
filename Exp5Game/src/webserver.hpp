@@ -16,8 +16,9 @@ public:
 	WebServer(ApplicationUI* parent);
 	virtual ~WebServer();
 	void AppendAddress(QByteArray address);
+	QString getHighestScorer();
 
-	QMap<QByteArray, int>* m_pPlayers;
+	QMap<QByteArray, int> mPlayers;
 
 private:
 	Pillow::HttpServer* m_pServer;

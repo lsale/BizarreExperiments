@@ -1,10 +1,11 @@
 1
-12
-CustomSlider.qml
+13
+CustomCountdown.qml
 main.qml
 race.qml
 res/banana.gif
 res/beep.wav
+res/benny.mp3
 res/go.wav
 res/peanutbutter.mp3
 res/play.png

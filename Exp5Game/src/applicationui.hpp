@@ -21,9 +21,14 @@ public:
     ApplicationUI(bb::cascades::Application *app);
     virtual ~ApplicationUI();
     void ConnectionEstablished(QString requestType, QString player);
+    void setWinnerFlag(bool flagStatus);
+    Q_INVOKABLE QString getIPAddress();
+    Q_INVOKABLE bool startGame();
     int _donScore;
     int _lucaScore;
     int _maxScore;
+	bool _hasGameStarted;
+
 
 signals:
 	void scoreUpdated(const QVariant score, const QVariant player);
@@ -31,6 +36,7 @@ signals:
 
 private:
     bb::cascades::QmlDocument *_qml;
+    bool _hasPlayerWon;
 };
 
 #endif /* ApplicationUI_HPP_ */
