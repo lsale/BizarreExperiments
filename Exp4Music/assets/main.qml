@@ -4,157 +4,96 @@ import QtMobility.sensors 1.2
 
 Page {
 
-    property real displayWidth: 720
-    property real displayHeight: 1280
-
-    property string recordingUrl
+    property string drumUrl
     property bool isRecording: false
     property bool isPlaying: false
-
+    
     Container {
+        background: Color.Black
+
         layout: DockLayout {
 
         }
-        Container {
-            id: pitchDisplayContainer
-            background: Color.Green
-            preferredHeight: 200
-            horizontalAlignment: HorizontalAlignment.Fill
-            verticalAlignment: VerticalAlignment.Bottom
+
+        ImageView {
+            imageSource: "asset:///guitar.png"
+            onTouch: {
+                if (event.isDown()) {
+
+                    //Play the bass note at the current angle
+                    app.playBass(convertAccelerometerToPitch(accelSensor.reading.y));
+                }
+            }
         }
-        Container {
-
-            id: controlContainer
-            //background: Color.Gray
-            preferredHeight: (displayWidth / 3) + 40
-            leftPadding: 20.0
-            topPadding: 20.0
-            rightPadding: 20.0
-            bottomPadding: 20.0
-            
-            layout: StackLayout {
-                orientation: LayoutOrientation.LeftToRight
-            }
-            
-            ImageButton {
-                id: toneButton
-                defaultImageSource: "asset:///btn_note.png"
-                onClicked: {
-                    app.playTone();
-                }
-                layoutProperties: StackLayoutProperties {
-                    spaceQuota: 1.0
-                }
-            }
-            ImageButton {
-                id: recordButton
-                defaultImageSource: isRecording ? "asset:///btn_stop.png" : "asset:///btn_record.png"
+        ImageView {
+            imageSource: "asset:///btn_record.png"
+            verticalAlignment: VerticalAlignment.Bottom
+            horizontalAlignment: HorizontalAlignment.Right
+            preferredWidth: 300
+            onTouch: {
+                if (event.isDown()) {
                 
-                onClicked: {
-                    if (isRecording) {
-                        recorder.reset();
-                        isRecording = false;
-                    } else {
+                    if (!isRecording)
+                    {
+                        if (isPlaying){
+                            app.stopDrum();
+                        }
                         recorder.record();
-                        isRecording = true;
+                    } 
+                    else 
+                    {
+                        //stop recording
+                        recorder.reset();
                     }
-                }
-                layoutProperties: StackLayoutProperties {
-                    spaceQuota: 1.0
+                    isRecording = !isRecording;
                 }
             }
-            ImageButton {
-                id: playButton
-                defaultImageSource: isPlaying ? "asset:///btn_stop.png" : "asset:///btn_play.png"
+            scalingMethod: ScalingMethod.AspectFit
+        }
 
-				onClicked: {
+        ImageView {
+            imageSource: "asset:///btn_play.png"
+            verticalAlignment: VerticalAlignment.Top
+            horizontalAlignment: HorizontalAlignment.Right
+            onTouch: {
+                if (event.isDown()) {
                     if (isPlaying) {
-                        console.log("Stopping sound");
-                        app.stopSound();
+                        app.stopDrum()
                     } else {
-                        console.log("Playing sound");
-                        app.playSound();
+                        app.startDrum();
                     }
                     isPlaying = !isPlaying;
                 }
-                layoutProperties: StackLayoutProperties {
-                    spaceQuota: 1.0
-                }
             }
         }
-        
-        Label {
-            id: xReading
-        }
-        Label {
-            objectName: "debugLabel"
-            text: ""
-            verticalAlignment: VerticalAlignment.Bottom
-        }
-        attachedObjects: [
-            LayoutUpdateHandler {
-                onLayoutFrameChanged: {
-                    
-                    displayWidth = layoutFrame.width;
-                    displayHeight = layoutFrame.height;
-                    
-                    console.log("Display: "+displayWidth+"x"+displayHeight);
-                }
-            }   
-        ]
-        
+
     }
     attachedObjects: [
-        AudioRecorder {
-            id: recorder
-            outputUrl: recordingUrl
-            onMediaStateChanged: {
-                console.log("XXXX Media state changed to: " + recorder.mediaState);
-
-                if (recorder.mediaState == MediaState.Unprepared) {
-                    console.log("XXXX Loading the sound for playback");
-                    app.loadSound();
-                }
-            }
-        },
-        MediaPlayer {
-            id: player
-            sourceUrl: recordingUrl
-            repeatMode: RepeatMode.All
-        },
         Accelerometer {
             id: accelSensor
             active: true
             alwaysOn: true
-            //skipDuplicates: true
-            
-            onReadingChanged: {
-                //console.log("Accelerometer reading changed to: " + reading.x);
-                xReading.text = reading.x.toFixed(2);
-                
-                pitchDisplayContainer.preferredHeight = convertAccelerometerToHeight(reading.x.toFixed(2));
-                
-                if (isPlaying) {
-                    app.setPitch(convertAccelerometerToPitch(reading.x.toFixed(2)));
+        },
+        AudioRecorder {
+            id: recorder
+            outputUrl: drumUrl
+            onMediaStateChanged: {
+                console.log("XXXX Media state changed to: " + recorder.mediaState);
+
+                if (recorder.mediaState == MediaState.Unprepared) {
+                    console.log("XXXX Loading the drum sound for playback");
+                    app.loadDrum();
                 }
             }
         }
     ]
-
-    function convertAccelerometerToHeight(reading){
-    	
-    	//-10 = 0, 10 = displayHeight
-        var reading = parseFloat(reading);
-        if (reading < -10) reading = -10;
-        if (reading > 10) reading = 10;
-        
-        var newHeight  = (parseFloat(reading)+10.0)*64;
-    	return newHeight.toFixed(0);
-    }
+    
     function convertAccelerometerToPitch(reading) {
-
+        
         //Reading range is -10 to 10, convert to 0 to 2
-        var pitch = ((reading * 0.1) + 1).toFixed(2);
+        console.log("Reading is: "+reading);
+        
+        var pitch = ((reading * 0.05) + 1).toFixed(2);
         console.log("New pitch: " + pitch);
         return pitch;
     }

@@ -3,45 +3,67 @@ BASEDIR =  $$quote($$_PRO_FILE_PWD_)
 
 device {
     CONFIG(debug, debug|release) {
-        SOURCES +=  $$quote($$BASEDIR/src/DroneController.cpp) \
-                 $$quote($$BASEDIR/src/GamePadListener.cpp) \
+        SOURCES +=  $$quote($$BASEDIR/src/GamePadHandler.cpp) \
+                 $$quote($$BASEDIR/src/VideoDecoder.cpp) \
                  $$quote($$BASEDIR/src/applicationui.cpp) \
+                 $$quote($$BASEDIR/src/drone/DroneController.cpp) \
+                 $$quote($$BASEDIR/src/drone/atcommand.cpp) \
+                 $$quote($$BASEDIR/src/drone/navdatahandler.cpp) \
                  $$quote($$BASEDIR/src/main.cpp)
 
-        HEADERS +=  $$quote($$BASEDIR/src/DroneController.h) \
-                 $$quote($$BASEDIR/src/GamePadListener.h) \
+        HEADERS +=  $$quote($$BASEDIR/src/GamePadHandler.h) \
+                 $$quote($$BASEDIR/src/VideoDecoder.h) \
                  $$quote($$BASEDIR/src/applicationui.hpp) \
-                 $$quote($$BASEDIR/src/navdata.h)
+                 $$quote($$BASEDIR/src/drone/DroneController.h) \
+                 $$quote($$BASEDIR/src/drone/atcommand.h) \
+                 $$quote($$BASEDIR/src/drone/navdata.h) \
+                 $$quote($$BASEDIR/src/drone/navdata5.h) \
+                 $$quote($$BASEDIR/src/drone/navdatahandler.h)
     }
 
     CONFIG(release, debug|release) {
-        SOURCES +=  $$quote($$BASEDIR/src/DroneController.cpp) \
-                 $$quote($$BASEDIR/src/GamePadListener.cpp) \
+        SOURCES +=  $$quote($$BASEDIR/src/GamePadHandler.cpp) \
+                 $$quote($$BASEDIR/src/VideoDecoder.cpp) \
                  $$quote($$BASEDIR/src/applicationui.cpp) \
+                 $$quote($$BASEDIR/src/drone/DroneController.cpp) \
+                 $$quote($$BASEDIR/src/drone/atcommand.cpp) \
+                 $$quote($$BASEDIR/src/drone/navdatahandler.cpp) \
                  $$quote($$BASEDIR/src/main.cpp)
 
-        HEADERS +=  $$quote($$BASEDIR/src/DroneController.h) \
-                 $$quote($$BASEDIR/src/GamePadListener.h) \
+        HEADERS +=  $$quote($$BASEDIR/src/GamePadHandler.h) \
+                 $$quote($$BASEDIR/src/VideoDecoder.h) \
                  $$quote($$BASEDIR/src/applicationui.hpp) \
-                 $$quote($$BASEDIR/src/navdata.h)
+                 $$quote($$BASEDIR/src/drone/DroneController.h) \
+                 $$quote($$BASEDIR/src/drone/atcommand.h) \
+                 $$quote($$BASEDIR/src/drone/navdata.h) \
+                 $$quote($$BASEDIR/src/drone/navdata5.h) \
+                 $$quote($$BASEDIR/src/drone/navdatahandler.h)
     }
 }
 
 simulator {
     CONFIG(debug, debug|release) {
-        SOURCES +=  $$quote($$BASEDIR/src/DroneController.cpp) \
-                 $$quote($$BASEDIR/src/GamePadListener.cpp) \
+        SOURCES +=  $$quote($$BASEDIR/src/GamePadHandler.cpp) \
+                 $$quote($$BASEDIR/src/VideoDecoder.cpp) \
                  $$quote($$BASEDIR/src/applicationui.cpp) \
+                 $$quote($$BASEDIR/src/drone/DroneController.cpp) \
+                 $$quote($$BASEDIR/src/drone/atcommand.cpp) \
+                 $$quote($$BASEDIR/src/drone/navdatahandler.cpp) \
                  $$quote($$BASEDIR/src/main.cpp)
 
-        HEADERS +=  $$quote($$BASEDIR/src/DroneController.h) \
-                 $$quote($$BASEDIR/src/GamePadListener.h) \
+        HEADERS +=  $$quote($$BASEDIR/src/GamePadHandler.h) \
+                 $$quote($$BASEDIR/src/VideoDecoder.h) \
                  $$quote($$BASEDIR/src/applicationui.hpp) \
-                 $$quote($$BASEDIR/src/navdata.h)
+                 $$quote($$BASEDIR/src/drone/DroneController.h) \
+                 $$quote($$BASEDIR/src/drone/atcommand.h) \
+                 $$quote($$BASEDIR/src/drone/navdata.h) \
+                 $$quote($$BASEDIR/src/drone/navdata5.h) \
+                 $$quote($$BASEDIR/src/drone/navdatahandler.h)
     }
 }
 
-INCLUDEPATH +=  $$quote($$BASEDIR/src)
+INCLUDEPATH +=  $$quote($$BASEDIR/src/drone) \
+         $$quote($$BASEDIR/src)
 
 CONFIG += precompile_header
 

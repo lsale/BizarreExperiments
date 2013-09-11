@@ -53,35 +53,49 @@
 
     <!--  Name of author which is used for signing. Must match the developer name of your development certificate. -->
     <author>Example Inc.</author>
-    
-    <!--  Unique author ID assigned by signing authority. Required if using debug tokens. -->
-    <!-- <authorId>ABC1234YjsnUk235h</authorId> -->
-   
-    <initialWindow>
-        <autoOrients>true</autoOrients>
-        <systemChrome>none</systemChrome>
-        <transparent>false</transparent>
-    </initialWindow>
-    
-    <!--  The category where the application appears. Either core.games or core.media. -->
-    <category>core.games</category>
     <configuration name="Device-Debug">
        <platformArchitecture>armle-v7</platformArchitecture>
        <asset path="arm/o.le-v7-g/Exp3Drone" entry="true" type="Qnx/Elf">Exp3Drone</asset>
+       <asset path="../ffmpeg/arm-qnx/debug/lib/libavcodec.so.55">lib/libavcodec.so.55</asset>
+       <asset path="../ffmpeg/arm-qnx/debug/lib/libavformat.so.55">lib/libavformat.so.55</asset>
+       <asset path="../ffmpeg/arm-qnx/debug/lib/libavutil.so.52">lib/libavutil.so.52</asset>
+       <asset path="../x264/arm-qnx/debug/lib/libx264.so.135">lib/libx264.so.135</asset>
     </configuration>
     <configuration name="Device-Release">
        <entryPointType>Qnx/Cascades</entryPointType>
        <platformArchitecture>armle-v7</platformArchitecture>
        <asset path="arm/o.le-v7/Exp3Drone.so" entry="true" type="Qnx/Elf">Exp3Drone.so</asset>
+       <asset path="../ffmpeg/arm-qnx/release/lib/libavcodec.so.55">lib/libavcodec.so.55</asset>
+       <asset path="../ffmpeg/arm-qnx/release/lib/libavformat.so.55">lib/libavformat.so.55</asset>
+       <asset path="../ffmpeg/arm-qnx/release/lib/libavutil.so.52">lib/libavutil.so.52</asset>
+       <asset path="../x264/arm-qnx/release/lib/libx264.so.135">lib/libx264.so.135</asset>
     </configuration>
     <configuration name="Device-Profile">
        <platformArchitecture>armle-v7</platformArchitecture>
        <asset path="arm-p/o.le-v7-g/Exp3Drone" entry="true" type="Qnx/Elf">Exp3Drone</asset>
+       <asset path="../ffmpeg/target/lib/libavcodec.so.55">lib/libavcodec.so.55</asset>
+       <asset path="../ffmpeg/target/lib/libavformat.so.55">lib/libavformat.so.55</asset>
+       <asset path="../ffmpeg/target/lib/libavutil.so.52">lib/libavutil.so.52</asset>
+       <asset path="../x264/libx264.so.135">lib/libx264.so.135</asset>
     </configuration>
     <configuration name="Simulator-Debug">
        <platformArchitecture>x86</platformArchitecture>
        <asset path="x86/o-g/Exp3Drone" entry="true" type="Qnx/Elf">Exp3Drone</asset>
+       <asset path="../ffmpeg/target/lib/libavcodec.so.55">lib/libavcodec.so.55</asset>
+       <asset path="../ffmpeg/target/lib/libavformat.so.55">lib/libavformat.so.55</asset>
+       <asset path="../ffmpeg/target/lib/libavutil.so.52">lib/libavutil.so.52</asset>
+       <asset path="../x264/libx264.so.135">lib/libx264.so.135</asset>
     </configuration>
+    
+    <!--  Unique author ID assigned by signing authority. Required if using debug tokens. -->
+    <!-- <authorId>ABC1234YjsnUk235h</authorId> -->
+   
+    <initialWindow>
+        <aspectRatio>landscape</aspectRatio>
+        <autoOrients>false</autoOrients>
+        <systemChrome>none</systemChrome>
+        <transparent>false</transparent>
+    </initialWindow>
     
     <!--  The icon for the application, which should be 114x114. -->
     <icon>
@@ -98,6 +112,8 @@
     
     <!-- Request permission to execute native code.  Required for native applications. -->
     <permission system="true">run_native</permission>
+    <permission>run_when_backgrounded</permission>
+    <permission>use_gamepad</permission>
     <env var="LD_LIBRARY_PATH" value="app/native/lib:/usr/lib/qt4/lib"/>
 
 </qnx>

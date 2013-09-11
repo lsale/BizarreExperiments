@@ -1,94 +1,146 @@
 #include "applicationui.hpp"
 
+#include "Timer.cpp"
+
 #include <bb/cascades/Application>
 #include <bb/cascades/QmlDocument>
 #include <bb/cascades/AbstractPane>
+#include <bb/cascades/Window>
+#include <pthread.h>
+#include <errno.h>
 
 using namespace bb::cascades;
 
-#define RECORDING_PATH "/accounts/1000/shared/music/recording.wav"
+#define DRUM_PATH "/accounts/1000/shared/music/drum.wav"
 
 ApplicationUI::ApplicationUI(bb::cascades::Application *app) :
-        QObject(app)
+		QObject(app)
 {
+
+	//Stop the screen from timing out
+	app->mainWindow()->setScreenIdleMode(ScreenIdleMode::KeepAwake);
+
+	//Read the current scheduling parameters
+	sched_param schedParam;
+	int policy;
+	int getParamsResult = pthread_getschedparam(pthread_self(), &policy, &schedParam);
+
+	if (getParamsResult == EOK)
+	{
+		qDebug() << getSchedulingPolicyDescription(policy);
+	}
+
+	//Change the thread scheduling policy to FIFO
+	int setScheduleResult = pthread_setschedparam(pthread_self(), SCHED_FIFO, &schedParam);
+	if (setScheduleResult == EOK)
+	{
+		qDebug() << "Set scheduler to FIFO";
+	}
+	else
+	{
+		qDebug() << "Error setting scheduling policy to FIFO. Error: " << setScheduleResult;
+	}
+
+	//Change the thread priority to the maximum permissible
+	int priorityResult = pthread_setschedprio(pthread_self(), 63);
+
+	if (priorityResult == EOK)
+	{
+		qDebug() << "Successfully set new thread priority";
+	}
+	else
+	{
+		qDebug() << "Failed to set new thread priority. Result: " << priorityResult;
+	}
 
 	//Initialise our sound manager, which will play our sounds for us
 	m_pSoundManager = new SoundManager();
 
+	//Load the bass note
+	mBassPath = QDir::currentPath();
+	mBassPath.append("/app/native/assets/bass.wav");
+	m_pSoundManager->load(mBassPath);
+
+	//Create a timer for the drum
+	m_pDrumTimer = new QTimer();
+	m_pDrumTimer->setInterval(500);
+
+	//Connect the timeout to playing the drum
+	connect(m_pDrumTimer, SIGNAL(timeout()), this, SLOT(playDrum()));
+
 	// Create scene document from main.qml asset, the parent is set
-    // to ensure the document gets destroyed properly at shut down.
-    QmlDocument *qml = QmlDocument::create("asset:///main.qml").parent(this);
-    qml->setContextProperty("app", this);
+	// to ensure the document gets destroyed properly at shut down.
+	QmlDocument *qml = QmlDocument::create("asset:///main.qml").parent(this);
 
-    // Create root object for the UI
-    AbstractPane *root = qml->createRootObject<AbstractPane>();
+	// Expose the app object to the qml
+	qml->setContextProperty("app", this);
 
-    QString recordingUrl("file://");
-    recordingUrl.append(RECORDING_PATH);
-    root->setProperty("recordingUrl", recordingUrl);
+	// Create root object for the UI
+	AbstractPane *root = qml->createRootObject<AbstractPane>();
 
-    // Set created root object as the application scene
-    app->setScene(root);
+	//Set the recording path of the drum
+	QString recordingUrl("file://");
+	recordingUrl.append(DRUM_PATH);
+	root->setProperty("drumUrl", recordingUrl);
 
-    m_pDebugLabel = root->findChild<Label*>("debugLabel");
-
+	// Set created root object as the application scene
+	app->setScene(root);
 }
 
-ApplicationUI::~ApplicationUI(){
-
-	delete(m_pSoundManager);
+ApplicationUI::~ApplicationUI()
+{
+	delete m_pSoundManager;
 }
 
+void ApplicationUI::playBass(float pitch)
+{
+	m_pSoundManager->play(this->mBassPath, pitch, 0.8);
+}
 
-void ApplicationUI::loadSound(){
+void ApplicationUI::loadDrum(){
 
-	QString recordingPath(RECORDING_PATH);
+	QString recordingPath(DRUM_PATH);
 
 	if (m_pSoundManager->load(recordingPath)){
 
 		QString debug("Loaded: ");
 		debug.append(recordingPath);
-		setDebugText(debug);
+		qDebug() << "Loaded: " << recordingPath;
 	} else {
-		setDebugText("Failed to load recording");
+		qDebug() << "Failed to load recording";
 	}
 }
 
-/**
- * Plays the sound
- */
-void ApplicationUI::playSound(){
-
-	//Play the sound
-	QString recordingPath(RECORDING_PATH);
-	m_pSoundManager->play(recordingPath, 1.0f, 1.0f);
+void ApplicationUI::startDrum()
+{
+	m_pDrumTimer->start();
 }
 
-/**
- * Stops the sound
- */
-void ApplicationUI::stopSound(){
-
-	QString recordingPath(RECORDING_PATH);
-	m_pSoundManager->stop(recordingPath);
+void ApplicationUI::stopDrum()
+{
+	m_pDrumTimer->stop();
 }
 
-void ApplicationUI::setPitch(float newPitch){
-
-	QString recordingPath(RECORDING_PATH);
-	m_pSoundManager->setPitch(recordingPath,newPitch);
-
+void ApplicationUI::playDrum()
+{
+	m_pSoundManager->play(DRUM_PATH, 1.0, 1.0);
 }
 
-void ApplicationUI::playTone(){
+QString ApplicationUI::getSchedulingPolicyDescription(const int policy) {
 
-	if (!m_pSoundManager->playSquareTone()){
-		setDebugText("Failed to play tone");
+	QString policyName;
+
+	switch (policy) {
+	case SCHED_FIFO:
+		policyName = "FIFO";
+		break;
+	case SCHED_RR:
+		policyName = "RR";
+		break;
+	default:
+		policyName = policy;
+		break;
 	}
+
+	return policyName;
 }
-
-void ApplicationUI::setDebugText(QString debugText){
-
-	m_pDebugLabel->setText(debugText);
-}
-
