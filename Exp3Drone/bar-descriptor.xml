@@ -56,35 +56,35 @@
     <configuration name="Device-Debug">
        <platformArchitecture>armle-v7</platformArchitecture>
        <asset path="arm/o.le-v7-g/Exp3Drone" entry="true" type="Qnx/Elf">Exp3Drone</asset>
-       <asset path="../ffmpeg/arm-qnx/debug/lib/libavcodec.so.55">lib/libavcodec.so.55</asset>
-       <asset path="../ffmpeg/arm-qnx/debug/lib/libavformat.so.55">lib/libavformat.so.55</asset>
-       <asset path="../ffmpeg/arm-qnx/debug/lib/libavutil.so.52">lib/libavutil.so.52</asset>
-       <asset path="../x264/arm-qnx/debug/lib/libx264.so.135">lib/libx264.so.135</asset>
+       <asset path="../../ffmpeg/arm-qnx/debug/lib/libavcodec.so.55">lib/libavcodec.so.55</asset>
+       <asset path="../../ffmpeg/arm-qnx/debug/lib/libavformat.so.55">lib/libavformat.so.55</asset>
+       <asset path="../../ffmpeg/arm-qnx/debug/lib/libavutil.so.52">lib/libavutil.so.52</asset>
+       <asset path="../../x264/arm-qnx/debug/lib/libx264.so.135">lib/libx264.so.135</asset>
     </configuration>
     <configuration name="Device-Release">
        <entryPointType>Qnx/Cascades</entryPointType>
        <platformArchitecture>armle-v7</platformArchitecture>
        <asset path="arm/o.le-v7/Exp3Drone.so" entry="true" type="Qnx/Elf">Exp3Drone.so</asset>
-       <asset path="../ffmpeg/arm-qnx/release/lib/libavcodec.so.55">lib/libavcodec.so.55</asset>
-       <asset path="../ffmpeg/arm-qnx/release/lib/libavformat.so.55">lib/libavformat.so.55</asset>
-       <asset path="../ffmpeg/arm-qnx/release/lib/libavutil.so.52">lib/libavutil.so.52</asset>
-       <asset path="../x264/arm-qnx/release/lib/libx264.so.135">lib/libx264.so.135</asset>
+       <asset path="../../ffmpeg/arm-qnx/release/lib/libavcodec.so.55">lib/libavcodec.so.55</asset>
+       <asset path="../../ffmpeg/arm-qnx/release/lib/libavformat.so.55">lib/libavformat.so.55</asset>
+       <asset path="../../ffmpeg/arm-qnx/release/lib/libavutil.so.52">lib/libavutil.so.52</asset>
+       <asset path="../../x264/arm-qnx/release/lib/libx264.so.135">lib/libx264.so.135</asset>
     </configuration>
     <configuration name="Device-Profile">
        <platformArchitecture>armle-v7</platformArchitecture>
        <asset path="arm-p/o.le-v7-g/Exp3Drone" entry="true" type="Qnx/Elf">Exp3Drone</asset>
-       <asset path="../ffmpeg/target/lib/libavcodec.so.55">lib/libavcodec.so.55</asset>
-       <asset path="../ffmpeg/target/lib/libavformat.so.55">lib/libavformat.so.55</asset>
-       <asset path="../ffmpeg/target/lib/libavutil.so.52">lib/libavutil.so.52</asset>
-       <asset path="../x264/libx264.so.135">lib/libx264.so.135</asset>
+       <asset path="../../ffmpeg/arm-qnx/debug/lib/libavcodec.so.55">lib/libavcodec.so.55</asset>
+       <asset path="../../ffmpeg/arm-qnx/debug/lib/libavformat.so.55">lib/libavformat.so.55</asset>
+       <asset path="../../ffmpeg/arm-qnx/debug/lib/libavutil.so.52">lib/libavutil.so.52</asset>
+       <asset path="../../x264/arm-qnx/debug/lib/libx264.so.135">lib/libx264.so.135</asset>
     </configuration>
     <configuration name="Simulator-Debug">
        <platformArchitecture>x86</platformArchitecture>
        <asset path="x86/o-g/Exp3Drone" entry="true" type="Qnx/Elf">Exp3Drone</asset>
-       <asset path="../ffmpeg/target/lib/libavcodec.so.55">lib/libavcodec.so.55</asset>
-       <asset path="../ffmpeg/target/lib/libavformat.so.55">lib/libavformat.so.55</asset>
-       <asset path="../ffmpeg/target/lib/libavutil.so.52">lib/libavutil.so.52</asset>
-       <asset path="../x264/libx264.so.135">lib/libx264.so.135</asset>
+       <asset path="../../ffmpeg/x86-qnx/debug/lib/libavcodec.so.55">lib/libavcodec.so.55</asset>
+       <asset path="../../ffmpeg/x86-qnx/debug/lib/libavformat.so.55">lib/libavformat.so.55</asset>
+       <asset path="../../ffmpeg/x86-qnx/debug/lib/libavutil.so.52">lib/libavutil.so.52</asset>
+       <asset path="../../x264/x86-qnx/debug/lib/libx264.so.135">lib/libx264.so.135</asset>
     </configuration>
     
     <!--  Unique author ID assigned by signing authority. Required if using debug tokens. -->
