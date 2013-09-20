@@ -146,5 +146,5 @@ NavigationPane {
     onPopTransitionEnded: { 
         page.destroy();
         reset();
-        }
+    }
 }

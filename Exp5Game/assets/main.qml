@@ -1,20 +1,21 @@
 import bb.cascades 1.0
-//import bb.multimedia 1.0
+import bb.multimedia 1.0
 
 Page {
-    property int dScore: 10
-    property int lScore: 10
-    property int maxScore: 30
-    property int globalPosition: (dScore-lScore)*10
-    onDScoreChanged: {
-        if(dScore>maxScore)
+    property bool hasGameStarted
+    property int donScore: 0
+    property int lucaScore: 0
+    property int maxScore: 100
+    property string deviceIPAddress 
+    onDonScoreChanged: {
+        if(donScore>maxScore)
             winnerScreen.visible = true
-        leftMid.translationX = globalPosition
+        leftMid.translationX = donScore
     }
-    onLScoreChanged: {
-        if(lScore>maxScore)
+    onLucaScoreChanged: {
+        if(lucaScore>maxScore)
             winnerScreen.visible = true
-        rightMid.translationX = -globalPosition
+        rightMid.translationX = -lucaScore
     }
     Container {
         id: game
@@ -26,16 +27,57 @@ Page {
              	ohBoy.play()
          }
         }
+        Container{
+            id: startSplash
+            minHeight: 768
+            minWidth: 1280
+            background: Color.Black
+            opacity: 0.5
+            layout: DockLayout {
+            }
+            Label {
+                text: "Get ready!\nConnect to "
+                multiline: true
+                textStyle.fontSize: FontSize.PercentageValue
+                textStyle.fontSizeValue: 300
+                textStyle.color: Color.White
+                textStyle.textAlign: TextAlign.Center
+                horizontalAlignment: HorizontalAlignment.Center
+
+            }
+            Label {
+                text: "http://"+deviceIPAddress+":1337/"
+                multiline: true
+                textStyle.fontSize: FontSize.PercentageValue
+                textStyle.fontSizeValue: 300
+                textStyle.color: Color.Green
+                textStyle.textAlign: TextAlign.Center
+                horizontalAlignment: HorizontalAlignment.Center
+                verticalAlignment: VerticalAlignment.Center
+            
+            }
+            Button {
+                text: "Start!"
+                verticalAlignment: VerticalAlignment.Bottom
+                horizontalAlignment: HorizontalAlignment.Center
+                onClicked: {
+                    hasGameStarted = mainApp.startGame()
+                    startSplash.setVisible(false)
+                }
+            }
+        }
         Container {
             objectName: "mainContainer"
             function scoreUpdate(score, player){
-                switch(player){
-                    case 0:
-                        dScore = score
-                        break;
-                    case 1:
-                        lScore = score
-                        break;
+                if(hasGameStarted){
+                    switch(player){
+                        case 0:
+                            donScore = score
+                            break;
+                        case 1:
+                            lucaScore = score
+                            break;
+                    }
                 }
             }
             function updatePlayer(player){
@@ -52,17 +94,18 @@ Page {
                 }
             }
             Container {
-                background: Color.Red
+                //background: Color.Red
+                horizontalAlignment: HorizontalAlignment.Fill
                 layout: StackLayout {
-                    orientation: LayoutOrientation.LeftToRight
-                
+                    orientation: LayoutOrientation.TopToBottom
                 }
                 Container {
-                    background: Color.Blue
+                    //background: Color.Blue
                     id: left
-                    
-                    layoutProperties: StackLayoutProperties {
-                        spaceQuota: 2.0
+                    horizontalAlignment: HorizontalAlignment.Fill
+                    layout: StackLayout {
+                        orientation: LayoutOrientation.LeftToRight
+
                     }
                     Label {
                         text: "Luca"
@@ -70,52 +113,63 @@ Page {
                         textStyle.fontSize: FontSize.PercentageValue
                         textStyle.fontSizeValue: 200
                         horizontalAlignment: HorizontalAlignment.Center
-                    }
-                }
-                Container {
-                    background: Color.Yellow
-                    id: center
-                    topPadding: 70.0
-                    layoutProperties: StackLayoutProperties {
-                        spaceQuota: -1.0
-                    }
-                    layout: StackLayout {
-                        orientation: LayoutOrientation.LeftToRight
-                    
-                    }
-                    Label {
-                        text: lScore
-                        textStyle.color: Color.White
-                        textStyle.fontSize: FontSize.PercentageValue
-                        textStyle.fontSizeValue: 400
-                        horizontalAlignment: HorizontalAlignment.Fill
-                    }
-                    Label {
-                        text: ":"
-                        textStyle.color: Color.White
-                        textStyle.fontSize: FontSize.PercentageValue
-                        textStyle.fontSizeValue: 300
-                        horizontalAlignment: HorizontalAlignment.Center
-                    }
-                    Label {
-                        text: dScore
-                        textStyle.color: Color.White
-                        textStyle.fontSize: FontSize.PercentageValue
-                        textStyle.fontSizeValue: 400
-                        horizontalAlignment: HorizontalAlignment.Center
-                    }
-                }
-                Container {
-                    id: right
-                    layoutProperties: StackLayoutProperties {
-                        spaceQuota: 2.0
+                        layoutProperties: StackLayoutProperties {
+                            spaceQuota: 1
+                        }
+                        textStyle.textAlign: TextAlign.Center
                     }
                     Label {
                         text: "Don"
                         textStyle.color: Color.White
                         textStyle.fontSize: FontSize.PercentageValue
                         textStyle.fontSizeValue: 200
+                        
                         horizontalAlignment: HorizontalAlignment.Center
+                        layoutProperties: StackLayoutProperties {
+                            spaceQuota: 1
+                        }
+                        textStyle.textAlign: TextAlign.Center
+                    }
+                    
+                }
+                Container {
+                    //background: Color.Yellow
+                    id: center
+                    horizontalAlignment: HorizontalAlignment.Fill
+                    layout: StackLayout {
+                        orientation: LayoutOrientation.LeftToRight
+                    }
+                    Label {
+                        text: lucaScore
+                        textStyle.color: Color.White
+                        textStyle.fontSize: FontSize.PercentageValue
+                        textStyle.fontSizeValue: 400
+                        horizontalAlignment: HorizontalAlignment.Fill
+                        textStyle.textAlign: TextAlign.Right
+                        layoutProperties: StackLayoutProperties {
+                            spaceQuota: 1
+                        }
+                    }
+                    Label {
+                        text: ":"
+                        textStyle.color: Color.White
+                        textStyle.fontSize: FontSize.PercentageValue
+                        textStyle.fontSizeValue: 300
+                        textStyle.textAlign: TextAlign.Center
+                        horizontalAlignment: HorizontalAlignment.Center
+                        layoutProperties: StackLayoutProperties {
+                            spaceQuota: -1
+                        }
+                    }
+                    Label {
+                        text: donScore
+                        textStyle.color: Color.White
+                        textStyle.fontSize: FontSize.PercentageValue
+                        textStyle.fontSizeValue: 400
+                        horizontalAlignment: HorizontalAlignment.Center
+                        layoutProperties: StackLayoutProperties {
+                            spaceQuota: 1
+                        }
                     }
                 }
             }
@@ -199,12 +253,15 @@ Page {
                 }
             }
         }
+        onCreationCompleted: {
+            deviceIPAddress = mainApp.getIPAddress();
+        }
         attachedObjects: [
-            /*MediaPlayer{
+            MediaPlayer{
                 id: ohBoy
                 sourceUrl: "asset:///ohmygod.mp3"
                 
-            }*/
+            }
         ]
     }
     

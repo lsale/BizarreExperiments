@@ -12,7 +12,7 @@
 <context>
     <name>race</name>
     <message>
-        <location filename="../assets/race.qml" line="14"/>
+        <location filename="../assets/race.qml" line="15"/>
         <source>FIRE!</source>
         <translation type="unfinished"></translation>
     </message>

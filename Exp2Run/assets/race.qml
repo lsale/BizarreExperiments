@@ -3,15 +3,11 @@ import CustomTimer 1.0
 import bb.multimedia 1.0
 
 Page {
-    property int counter: 10
-    property int decrement: 10
+    property int currentTimeRemaining: 10
+    property int targetLapTime: 10
     property bool shoot
     property int lap
-    property bool victory: true
-    function decrementCounter(){
-        if (decrement>3)
-        	decrement--        	 
-    }
+    property bool inProgress: true
     Container {
         background: (shoot) ? Color.Red : Color.Black
         Label {
@@ -23,24 +19,16 @@ Page {
             textStyle.color: Color.White
             verticalAlignment: VerticalAlignment.Center
             horizontalAlignment: HorizontalAlignment.Center
-            enabled: victory
+            enabled: inProgress
         }
-        CustomSlider{
+        CustomCountdown{
             id: countdown
-            number: counter
+            number: currentTimeRemaining
             verticalAlignment: VerticalAlignment.Center
             horizontalAlignment: HorizontalAlignment.Center
-            visible: victory
+            visible: inProgress
+            isFireScreenOn: shoot
         }
-//        Label {
-//            id: countdown
-//            text: counter
-//            textStyle.fontSize: FontSize.PercentageValue
-//            textStyle.fontSizeValue: 5000
-//            textStyle.color: Color.White
-//            verticalAlignment: VerticalAlignment.Center
-//            horizontalAlignment: HorizontalAlignment.Center
-//        }
         Label {
             id: lapCounter
             text: "Lap: "+lap
@@ -49,7 +37,7 @@ Page {
             textStyle.color: Color.White
             verticalAlignment: VerticalAlignment.Center
             horizontalAlignment: HorizontalAlignment.Center
-            visible: victory
+            visible: inProgress
         }
         Container {
             id: banana
@@ -83,13 +71,13 @@ Page {
             id: mainTimer
             interval: 1000
             onTimeout: {
-                if(counter>0){
-                    counter--
+                if(currentTimeRemaining>0){
+                    currentTimeRemaining--
                 }else{
                     shoot = true 
                     siren.play()
                     resetter.start()
-                    counter = decrement;
+                    currentTimeRemaining = targetLapTime;
                 }
             }
             attachedObjects: [
@@ -112,16 +100,20 @@ Page {
         }
     }
     onLapChanged: {
-        if(lap<10 && decrement>0){
-            decrementCounter()
-            counter = decrement
-            if(!shoot)
-                yay.play()
-        }else{
+        if(lap == 10){
             console.log('race over')
             mainTimer.stop()
-            victory = false 
+            bennyHill.stop()
+            inProgress = false 
             banana.setVisible(true)
+        } else {
+            if(targetLapTime > 5){
+                targetLapTime--
+            }
+            currentTimeRemaining = targetLapTime
+            if(!shoot){
+                yay.play()
+            }
         }  
     }
     attachedObjects: [
@@ -132,6 +124,7 @@ Page {
         MediaPlayer {
             id: bennyHill
             sourceUrl: "res/benny.mp3"
+            repeatMode: RepeatMode.All
         }
     ]
     onCreationCompleted: {
