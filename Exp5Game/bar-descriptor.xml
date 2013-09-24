@@ -56,7 +56,7 @@
     <configuration name="Device-Debug">
        <platformArchitecture>armle-v7</platformArchitecture>
        <asset path="arm/o.le-v7-g/Exp5Game" entry="true" type="Qnx/Elf">Exp5Game</asset>
-       <asset path="/Users/luca/ndk-10.2.0-workspace/HttpLib/lib/libHttpLib.so.1">lib/libHttpLib.so.1</asset>
+       <asset path="../../HttpLib/lib/libHttpLib.so.1">lib/libHttpLib.so.1</asset>
     </configuration>
     <configuration name="Device-Release">
        <entryPointType>Qnx/Cascades</entryPointType>
