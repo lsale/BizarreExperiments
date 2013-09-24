@@ -99,13 +99,11 @@ void ApplicationUI::playBass(float pitch)
 
 void ApplicationUI::loadDrum(){
 
-	QString recordingPath(DRUM_PATH);
-
-	if (m_pSoundManager->load(recordingPath)){
+	if (m_pSoundManager->load(DRUM_PATH)){
 
 		QString debug("Loaded: ");
-		debug.append(recordingPath);
-		qDebug() << "Loaded: " << recordingPath;
+		debug.append(DRUM_PATH);
+		qDebug() << "Loaded: " << DRUM_PATH;
 	} else {
 		qDebug() << "Failed to load recording";
 	}
@@ -113,17 +111,26 @@ void ApplicationUI::loadDrum(){
 
 void ApplicationUI::startDrum()
 {
+	qDebug() << "[ApplicationUI] startDrum - start";
 	m_pDrumTimer->start();
+	qDebug() << "[ApplicationUI] startDrum - end";
 }
 
 void ApplicationUI::stopDrum()
 {
+	qDebug() << "[ApplicationUI] stopDrum - start";
 	m_pDrumTimer->stop();
+
+	//Stop the drum from playing
+	m_pSoundManager->stop(DRUM_PATH);
+	qDebug() << "[ApplicationUI] stopDrum - end";
 }
 
 void ApplicationUI::playDrum()
 {
+	qDebug() << "[ApplicationUI] playDrum - start";
 	m_pSoundManager->play(DRUM_PATH, 1.0, 1.0);
+	qDebug() << "[ApplicationUI] playDrum - end";
 }
 
 QString ApplicationUI::getSchedulingPolicyDescription(const int policy) {
