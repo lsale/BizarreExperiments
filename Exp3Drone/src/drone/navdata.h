@@ -137,7 +137,7 @@ typedef struct _navdata_t {
   quint32    header;
   quint32    ardrone_state;
   quint32    sequence;
-  qint32      vision_defined;
+  bool  	 vision_defined;
 
   navdata_option_t  options[1];
 }_ATTRIBUTE_PACKED_ navdata_t;

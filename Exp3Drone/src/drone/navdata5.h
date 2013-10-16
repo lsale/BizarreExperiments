@@ -58,11 +58,15 @@ typedef struct _navdata_unpacked_5_t {
 
 static inline bool ardrone_navdata_unpack_all_5(navdata_unpacked_5_t* navdata_unpacked, navdata_t* navdata, quint32* cks)
 {
-    bool res = true;
+
+	qDebug() << "[navdata5] anua5 - start";
+	bool res = true;
     navdata_cks_t navdata_cks = { 0 };
     navdata_option_t* navdata_option_ptr;
 
     navdata_option_ptr = (navdata_option_t*) &navdata->options[0];
+
+    qDebug() << "[navdata5] anua5 - Got navdata_option_ptr. Tag: " << navdata_option_ptr->tag << " Size: " << navdata_option_ptr->size << " Data: " << navdata_option_ptr->data;
 
     memset(navdata_unpacked, 0, sizeof(*navdata_unpacked));
 
@@ -72,7 +76,7 @@ static inline bool ardrone_navdata_unpack_all_5(navdata_unpacked_5_t* navdata_un
     while (navdata_option_ptr != NULL) {
         // Check if we have a valid option
         if (navdata_option_ptr->size == 0) {
-            qDebug() << "[NavDataHandler] Error: Option size is zero";
+            qDebug() << "[navdata5] anua5 - Error: Option size is zero";
             navdata_option_ptr = NULL;
             res = false;
         } else {

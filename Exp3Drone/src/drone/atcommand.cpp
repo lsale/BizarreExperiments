@@ -411,28 +411,32 @@ void AtCommand::sendInitSequence(int step)
 	{
 	case 1:
 	{
+		qDebug() << "[AtCommand] sendInitSequence - STEP 1: Sending navdata_demo config message";
+
 		// We would like to receive a limited amount of feedback data from the drone. We do not need
 		// debug data.
 		datagramInit = "AT*CONFIG=1,\"general:navdata_demo\",\"TRUE\"\r";
 		int res = udpSocketInit->writeDatagram(datagramInit.data(), datagramInit.size(), hostAddress, AT_PORT);
 		if (res == -1)
 		{
-			qDebug() << "[AtCommand] Error sending navdata_demo config message!";
+			qDebug() << "[AtCommand] sendInitSequence - STEP 1: Error sending navdata_demo config message!";
 		}
 
 		break;
 	}
 	case 2:
 	{
+		qDebug() << "[AtCommand] sendInitSequence - STEP 2";
+
 		datagramInit = "AT*CTRL=2,5,0\r";
 		int res = udpSocketInit->writeDatagram(datagramInit.data(), datagramInit.size(), hostAddress, AT_PORT);
 		if (res == -1)
 		{
-			qDebug() << "[AtCommand] Error sending AT data!!";
+			qDebug() << "[AtCommand] sendInitSequence - STEP 2: Error sending AT data!!";
 		}
 		else
 		{
-			qDebug() << "[AtCommand] ACK_CONTROL_MODE sent succesfully";
+			qDebug() << "[AtCommand] sendInitSequence - STEP 2: ACK_CONTROL_MODE sent succesfully";
 		}
 
 		// This will make the drone set it's offset values. It is important that the drone is standing
@@ -441,7 +445,7 @@ void AtCommand::sendInitSequence(int step)
 		res = udpSocketInit->writeDatagram(datagramInit.data(), datagramInit.size(), hostAddress, AT_PORT);
 		if (res == -1)
 		{
-			qDebug() << "[AtCommand] Error sending AT data!!";
+			qDebug() << "[AtCommand] sendInitSequence - STEP 2: Error sending trim config";
 		}
 
 		// Disable bitrate control mode for the video feed, which is introduced in firmware 1.5.1.
@@ -450,7 +454,7 @@ void AtCommand::sendInitSequence(int step)
 		res = udpSocketInit->writeDatagram(datagramInit.data(), datagramInit.size(), hostAddress, AT_PORT);
 		if (res == -1)
 		{
-			qDebug() << "[AtCommand] Error sending AT data!!";
+			qDebug() << "[AtCommand] sendInitSequence - STEP 2: Error sending video bitrate config";
 		}
 
 		// Select the frontcamera as the initial camera to receive video from.
@@ -459,7 +463,7 @@ void AtCommand::sendInitSequence(int step)
 		res = udpSocketInit->writeDatagram(datagramInit.data(), datagramInit.size(), hostAddress, AT_PORT);
 		if (res == -1)
 		{
-			qDebug() << "[AtCommand] Error sending AT data!!";
+			qDebug() << "[AtCommand] sendInitSequence - STEP 2: Error sending AT data!!";
 		}
 
 		break;

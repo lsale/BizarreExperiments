@@ -102,20 +102,15 @@ void DroneController::handleConnected()
 {
 	qDebug() << "[DroneController] handleConnected - start";
 
-	//m_pNavDataHandler = new NavDataHandler(this);
+	m_pNavDataHandler = new NavDataHandler(this);
 	m_pAtCommand = new AtCommand(this);
 
-	m_pAtCommand->sendInitSequence(1);
-	m_pAtCommand->sendInitSequence(2);
+	bool success = connect(m_pNavDataHandler, SIGNAL(updateARDroneState(uint)), m_pAtCommand, SLOT(updateARDroneState(uint)));
+	bool success2 = connect(m_pNavDataHandler, SIGNAL(sendInitSequence(int)), m_pAtCommand, SLOT(sendInitSequence(int)));
 
-	m_pAtCommand->start(QThread::HighPriority);
-
-	//bool success = connect(m_pNavDataHandler, SIGNAL(updateARDroneState(uint)), m_pAtCommand, SLOT(updateARDroneState(uint)));
-	//bool success2 = connect(m_pNavDataHandler, SIGNAL(sendInitSequence(int)), m_pAtCommand, SLOT(sendInitSequence(int)));
-
-	//if (!success || !success2){
-	//	qDebug() << "[DroneController] handleConnected - Failed to connect the nav data handler with the AtCommand";
-	//}
+	if (!success || !success2){
+		qDebug() << "[DroneController] handleConnected - Failed to connect the nav data handler with the AtCommand";
+	}
 }
 
 void DroneController::takeOff()
