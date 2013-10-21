@@ -37,14 +37,28 @@ bool WebServer::handleRequest(Pillow::HttpConnection *connection){
 	n += connection->requestPathDecoded().size();
 	n += connection->requestQueryStringDecoded().size();
 	n += connection->requestParamValue(someParam).size();
-	helloWorldToken = connection->remoteAddress().toString().toLatin1();
-	QByteArray _response = "<html><head></head><body><font size='14'> Player: "+helloWorldToken+"<br><a href='javascript:location.reload()'>Play again</a></font></body></html>";
-	AppendAddress(helloWorldToken);
-	connection->writeResponse(200, Pillow::HttpHeaderCollection() << Pillow::HttpHeader("Content-Type", "text/html"), _response);
+
+	QString response = "<html><head></head><body><font size='22'>";
+
+	qDebug() << "[WebServer] handleRequest - path decoded: " << connection->requestPathDecoded();
+
+	if (connection->requestPathDecoded() == "/"){
+		//this is the root page, tell the user to choose a player
+		response.append("Choose player: <br /><span style='float: left'><a href='/luca'>Luca</a></span><span style='float: right'><a href='/don'>Don</a></span>");
+
+	} else {
+		playerIpAddress = connection->remoteAddress().toString().toLatin1();
+		response.append("Player: "+playerIpAddress+"<br><a href='javascript:location.reload()'>Play again</a>");
+		updateScore(playerIpAddress);
+	}
+
+	response.append("</font></body></html>");
+
+	connection->writeResponse(200, Pillow::HttpHeaderCollection() << Pillow::HttpHeader("Content-Type", "text/html"), response.toLatin1());
 	return true;
 }
 
-void WebServer::AppendAddress(QByteArray address){
+void WebServer::updateScore(QByteArray address){
 	if(m_pMyApp->_hasGameStarted){
 		qDebug() << "Adding to memory";
 		int _tempNum = 1;

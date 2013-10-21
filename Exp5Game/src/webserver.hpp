@@ -15,7 +15,7 @@ class WebServer : public QObject {
 public:
 	WebServer(ApplicationUI* parent);
 	virtual ~WebServer();
-	void AppendAddress(QByteArray address);
+	void updateScore(QByteArray address);
 	QString getHighestScorer();
 
 	QMap<QByteArray, int> mPlayers;
@@ -24,7 +24,7 @@ private:
 	Pillow::HttpServer* m_pServer;
 	qint64 n;
 	ApplicationUI* m_pMyApp;
-	QByteArray helloWorldToken;
+	QByteArray playerIpAddress;
 	int _maxScore;
 
 public slots:

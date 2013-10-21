@@ -76,8 +76,6 @@ QString ApplicationUI::getIPAddress()
 
 		qDebug() << "humanReadableName: " << interface.humanReadableName() << " name: " << interface.name();
 
-		//InterfaceFlags flags = interface.flags();
-
 		if(QString::compare(interface.humanReadableName(), "bcm0") == 0)
 		{
 			foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
