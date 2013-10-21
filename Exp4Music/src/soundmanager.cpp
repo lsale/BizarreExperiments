@@ -22,6 +22,7 @@
 #include <qdebug.h>
 
 #define GUITAR_WAV_PATH "/app/native/assets/bass.wav"
+#define DRUM_WAV_PATH "/accounts/1000/shared/music/drum.wav"
 
 //Error message functions
 static void reportALUTError(ALenum error)
@@ -40,6 +41,8 @@ SoundManager::SoundManager()
 
 	qDebug() << "[SoundManager] Constructor - start";
 
+	mDrumBufferId = 0;
+
 	// Initialize the ALUT
 	if (alutInit(NULL, NULL) == false)
 	{
@@ -48,7 +51,7 @@ SoundManager::SoundManager()
 
 	// Generate 2 sources, one for the guitar and one for the drum loop
 	alGenSources(1, &mGuitarSourceId);
-	alGenSources(1, &mDrumLoopSourceId);
+	alGenSources(1, &mDrumSourceId);
 	qDebug() << "[SoundManager] Constructor - Created sources for guitar and drums";
 
 	// Preload the guitar sound
@@ -56,12 +59,12 @@ SoundManager::SoundManager()
 	guitarPath.append(GUITAR_WAV_PATH);
 
 	qDebug() << "[SoundManager] Constructor - Attempting to create buffer for guitar file: " << guitarPath;
-	ALuint bufferId = alutCreateBufferFromFile(guitarPath.toStdString().c_str());
+	mGuitarBufferId = alutCreateBufferFromFile(guitarPath.toStdString().c_str());
 
 	ALenum error = alutGetError();
 	if (error == AL_NO_ERROR)
 	{
-		qDebug() << "[SoundManager] Constructor - Created buffer, id: " << bufferId ;
+		qDebug() << "[SoundManager] Constructor - Created buffer, id: " << mGuitarBufferId;
 	}
 	else
 	{
@@ -69,7 +72,7 @@ SoundManager::SoundManager()
 	}
 
 	//Attach the buffer to the source
-	alSourcei(mGuitarSourceId, AL_BUFFER, bufferId);
+	alSourcei(mGuitarSourceId, AL_BUFFER, mGuitarBufferId);
 
 	error = alGetError();
 	if (error == AL_NO_ERROR)
@@ -89,39 +92,35 @@ SoundManager::~SoundManager()
 
 	qDebug() << "[SoundManager] Destructor - start";
 
-	// Clear all the sources.
-	for (int sourceIndex = 0; sourceIndex < SOUNDMANAGER_MAX_NBR_OF_SOURCES; sourceIndex++)
+	// Delete the sources.
+	alDeleteSources(1, &mGuitarSourceId);
+	ALenum error = alGetError();
+	if (error != AL_NO_ERROR)
 	{
-		ALuint source = mSourceIds[sourceIndex];
-		alDeleteSources(1, &source);
-
-		ALenum error = alGetError();
-		if (error != AL_NO_ERROR)
-		{
-			reportOpenALError(error);
-		}
+		reportOpenALError(error);
 	}
 
-	// Clear the buffers by iterating through the hash table keys
-	QHashIterator<ALuint, ALuint> iterator(mAttachedSourceIds);
-
-	while (iterator.hasNext())
+	alDeleteSources(1, &mDrumSourceId);
+	error = alGetError();
+	if (error != AL_NO_ERROR)
 	{
-		iterator.next();
-
-		// Get the buffer id and delete it.
-		ALuint bufferId = iterator.key();
-		alDeleteBuffers(1, &bufferId);
-
-		ALenum error = alGetError();
-		if (error != AL_NO_ERROR)
-		{
-			reportOpenALError(error);
-		}
+		reportOpenALError(error);
 	}
 
-	// Clear the QHash for buffer IDs.
-	mAttachedSourceIds.clear();
+	//Delete the buffers
+	alDeleteBuffers(1, &mGuitarBufferId);
+	error = alGetError();
+	if (error != AL_NO_ERROR)
+	{
+		reportOpenALError(error);
+	}
+
+	alDeleteBuffers(1, &mDrumBufferId);
+	error = alGetError();
+	if (error != AL_NO_ERROR)
+	{
+		reportOpenALError(error);
+	}
 
 	// Exit the ALUT.
 	if (alutExit() == false)
@@ -133,179 +132,256 @@ SoundManager::~SoundManager()
 
 }
 
-bool SoundManager::load(QString filePath)
+void SoundManager::loadDrum()
 {
+	qDebug() << "[SoundManager] loadDrum - start";
 
-	bool isSuccessful = false;
+	ALenum error;
 
-	//Check to see whether this file has already been loaded
-	if (mSoundBuffers.contains(filePath))
+	//Store the current buffer id so we can delete it later
+	ALuint oldDrumBufferId = mDrumBufferId;
+
+	if (mDrumBufferId != 0)
 	{
-
-		ALuint bufferId = mSoundBuffers[filePath];
-		ALuint sourceId = mAttachedSourceIds[bufferId];
-
-		qDebug() << "XXXX Deleting old source id:" << sourceId << " attached to buffer id:" << bufferId << " for: " << filePath;
-
-		//First we need to detach the source from that buffer
-		alSourcei(sourceId, AL_BUFFER, 0);
-		ALenum error = alGetError();
-		if (error != AL_NO_ERROR)
-		{
-			qDebug() << "XXXX There was a problem detaching source id:" << sourceId << " from buffer id: " << bufferId;
-			reportOpenALError(error);
-		}
-
-		alDeleteBuffers(1, &bufferId);
+		//We already have a buffer, unqueue it from the source
+		alSourceUnqueueBuffers(mDrumSourceId, 1, &mDrumBufferId);
 		error = alGetError();
-		if (error != AL_NO_ERROR)
+		if (error == AL_NO_ERROR)
 		{
-			qDebug() << "XXXX There was a problem deleting buffer id:" << bufferId;
+			qDebug() << "[SoundManager] loadDrum - Unqueued buffer id: " << mDrumBufferId;
+		}
+		else
+		{
 			reportOpenALError(error);
 		}
 
-		mSoundBuffers.remove(filePath);
+		//Now delete the buffer
+		alDeleteBuffers(1, &mDrumBufferId);
+		error = alGetError();
+		if (error == AL_NO_ERROR)
+		{
+			qDebug() << "[SoundManager] loadDrum - Deleted buffer id: " << mDrumBufferId;
+		}
+		else
+		{
+			reportOpenALError(error);
+		}
 	}
 
-	//Create a buffer and fill it with data from the WAV file
-	ALuint bufferId = alutCreateBufferFromFile(filePath.toStdString().c_str());
+	//Create a new buffer from the drum wav file
+	QString drumPath(DRUM_WAV_PATH);
+	qDebug() << "[SoundManager] loadDrum - Attempting to create buffer for drum file: " << drumPath;
+	mDrumBufferId = alutCreateBufferFromFile(drumPath.toStdString().c_str());
 
-	if (bufferId != AL_NONE)
-	{
-
-		qDebug() << "XXXX Created buffer (id: " << bufferId << ") from file for: " << filePath;
-
-		//Record the bufferId which this file was loaded into
-		mSoundBuffers[filePath] = bufferId;
-
-		//Attach this buffer to an available source
-		ALuint sourceId = getNextAvailableSourceId();
-		isSuccessful = attachBufferToSource(bufferId, sourceId);
-
-	}
-	else
-	{
-
-		qDebug() << "XXXX Failed to create buffer for: " << filePath;
-		reportALUTError(alutGetError());
-	}
-
-	return isSuccessful;
-}
-
-bool SoundManager::play(QString filePath, float pitch, float gain)
-{
-
-	qDebug() << "XXXX Attempting to play file: " << filePath;
-
-	//Get the buffer and source IDs
-	ALuint bufferId = mSoundBuffers[filePath];
-	ALuint sourceId = mAttachedSourceIds[bufferId];
-
-	return playSource(sourceId, pitch, gain, false);
-}
-
-bool SoundManager::stop(QString filePath)
-{
-
-	//Get the buffer and source IDs
-	ALuint bufferId = mSoundBuffers[filePath];
-	ALuint sourceId = mAttachedSourceIds[bufferId];
-
-	alSourceStop(sourceId);
-
-	ALenum error = alGetError();
-	if (error != AL_NO_ERROR)
-	{
-		reportOpenALError(error);
-		return false;
-	}
-
-	return true;
-}
-
-bool SoundManager::setPitch(QString filePath, float newPitch)
-{
-
-	//Get the buffer and source IDs
-	ALuint bufferId = mSoundBuffers[filePath];
-	ALuint sourceId = mAttachedSourceIds[bufferId];
-
-	qDebug() << "Attempting to change pitch of buffer ID: " << bufferId << " attached to source ID: " << sourceId;
-
-	alSourcef(sourceId, AL_PITCH, newPitch);
-
-	ALenum error = alGetError();
-	if (error != AL_NO_ERROR)
-	{
-		reportOpenALError(error);
-		return false;
-	}
-
-	return true;
-}
-
-ALuint SoundManager::getNextAvailableSourceId()
-{
-
-	static uint sourceIndex = 0;
-
-	//Get the next available source
-	ALuint sourceId = mSourceIds[sourceIndex];
-
-	//Increment the source index so it points the next available source
-	sourceIndex = (sourceIndex + 1) % SOUNDMANAGER_MAX_NBR_OF_SOURCES;
-
-	qDebug() << "XXXX Incremented source index, it is now:" << sourceIndex;
-
-	return sourceId;
-}
-
-bool SoundManager::attachBufferToSource(ALuint bufferId, ALuint sourceId)
-{
-
-	bool isSuccessful = false;
-
-	qDebug() << "XXXX Attaching buffer to source, id:" << sourceId;
-
-	// Attach the buffer the available source.
-	alSourcei(sourceId, AL_BUFFER, bufferId);
-
-	ALenum error = alGetError();
+	error = alutGetError();
 	if (error == AL_NO_ERROR)
 	{
+		qDebug() << "[SoundManager] loadDrum - Created buffer, id: " << mDrumBufferId;
+	}
+	else
+	{
+		reportALUTError(error);
+	}
 
-		//Store the buffer id with the source id
-		mAttachedSourceIds[bufferId] = sourceId;
-		isSuccessful = true;
-
+	//Attach the new buffer to the drum source
+	alSourceQueueBuffers(mDrumSourceId, 1, &mDrumBufferId);
+	error = alGetError();
+	if (error == AL_NO_ERROR)
+	{
+		qDebug() << "[SoundManager] loadDrum - Queued buffer id: " << mDrumBufferId << " onto the drum source";
 	}
 	else
 	{
 		reportOpenALError(error);
 	}
 
-	return isSuccessful;
+	qDebug() << "[SoundManager] loadDrum - end";
 }
 
+/*bool SoundManager::load(QString filePath)
+ {
+
+ bool isSuccessful = false;
+
+ //Check to see whether this file has already been loaded
+ if (mSoundBuffers.contains(filePath))
+ {
+
+ ALuint bufferId = mSoundBuffers[filePath];
+ ALuint sourceId = mAttachedSourceIds[bufferId];
+
+ qDebug() << "XXXX Deleting old source id:" << sourceId << " attached to buffer id:" << bufferId << " for: " << filePath;
+
+ //First we need to detach the source from that buffer
+ alSourcei(sourceId, AL_BUFFER, 0);
+ ALenum error = alGetError();
+ if (error != AL_NO_ERROR)
+ {
+ qDebug() << "XXXX There was a problem detaching source id:" << sourceId << " from buffer id: " << bufferId;
+ reportOpenALError(error);
+ }
+
+ alDeleteBuffers(1, &bufferId);
+ error = alGetError();
+ if (error != AL_NO_ERROR)
+ {
+ qDebug() << "XXXX There was a problem deleting buffer id:" << bufferId;
+ reportOpenALError(error);
+ }
+
+ mSoundBuffers.remove(filePath);
+ }
+
+ //Create a buffer and fill it with data from the WAV file
+ ALuint bufferId = alutCreateBufferFromFile(filePath.toStdString().c_str());
+
+ if (bufferId != AL_NONE)
+ {
+
+ qDebug() << "XXXX Created buffer (id: " << bufferId << ") from file for: " << filePath;
+
+ //Record the bufferId which this file was loaded into
+ mSoundBuffers[filePath] = bufferId;
+
+ //Attach this buffer to an available source
+ ALuint sourceId = getNextAvailableSourceId();
+ isSuccessful = attachBufferToSource(bufferId, sourceId);
+
+ }
+ else
+ {
+
+ qDebug() << "XXXX Failed to create buffer for: " << filePath;
+ reportALUTError(alutGetError());
+ }
+
+ return isSuccessful;
+ }*/
+
+/*bool SoundManager::play(QString filePath, float pitch, float gain)
+ {
+
+ qDebug() << "XXXX Attempting to play file: " << filePath;
+
+ //Get the buffer and source IDs
+ ALuint bufferId = mSoundBuffers[filePath];
+ ALuint sourceId = mAttachedSourceIds[bufferId];
+
+ return playSource(sourceId, pitch, gain, false);
+ }*/
+/*
+ bool SoundManager::stop(QString filePath)
+ {
+
+ //Get the buffer and source IDs
+ ALuint bufferId = mSoundBuffers[filePath];
+ ALuint sourceId = mAttachedSourceIds[bufferId];
+
+ alSourceStop(sourceId);
+
+ ALenum error = alGetError();
+ if (error != AL_NO_ERROR)
+ {
+ reportOpenALError(error);
+ return false;
+ }
+
+ return true;
+ }*/
+
+/*
+ bool SoundManager::setPitch(QString filePath, float newPitch)
+ {
+
+ //Get the buffer and source IDs
+ ALuint bufferId = mSoundBuffers[filePath];
+ ALuint sourceId = mAttachedSourceIds[bufferId];
+
+ qDebug() << "Attempting to change pitch of buffer ID: " << bufferId << " attached to source ID: " << sourceId;
+
+ alSourcef(sourceId, AL_PITCH, newPitch);
+
+ ALenum error = alGetError();
+ if (error != AL_NO_ERROR)
+ {
+ reportOpenALError(error);
+ return false;
+ }
+
+ return true;
+ }*/
+
+/*
+ ALuint SoundManager::getNextAvailableSourceId()
+ {
+
+ static uint sourceIndex = 0;
+
+ //Get the next available source
+ ALuint sourceId = mSourceIds[sourceIndex];
+
+ //Increment the source index so it points the next available source
+ sourceIndex = (sourceIndex + 1) % SOUNDMANAGER_MAX_NBR_OF_SOURCES;
+
+ qDebug() << "XXXX Incremented source index, it is now:" << sourceIndex;
+
+ return sourceId;
+ }
+ */
+/*
+ bool SoundManager::attachBufferToSource(ALuint bufferId, ALuint sourceId)
+ {
+
+ bool isSuccessful = false;
+
+ qDebug() << "XXXX Attaching buffer to source, id:" << sourceId;
+
+ // Attach the buffer the available source.
+ alSourcei(sourceId, AL_BUFFER, bufferId);
+
+ ALenum error = alGetError();
+ if (error == AL_NO_ERROR)
+ {
+
+ //Store the buffer id with the source id
+ mAttachedSourceIds[bufferId] = sourceId;
+ isSuccessful = true;
+
+ }
+ else
+ {
+ reportOpenALError(error);
+ }
+
+ return isSuccessful;
+ }
+ */
 void SoundManager::playGuitar(float pitch, float gain)
 {
 	qDebug() << "[SoundManager] playGuitar - Pitch: " << pitch << " gain: " << gain;
 	playSource(mGuitarSourceId, pitch, gain, false);
 }
 
+void SoundManager::playDrum()
+{
+	qDebug() << "[SoundManager] playDrum - start";
+	playSource(mDrumSourceId, 1.0F, 1.0F, false);
+}
+
 bool SoundManager::playSource(ALuint sourceId, float pitch, float gain, bool shouldLoop)
 {
 
 	qDebug() << "[SoundManager] playSource - Playing source, id: " << sourceId << " pitch: " << pitch << " gain: " << gain << " loop? " << shouldLoop;
+
+	ALenum error;
 	//Set the source to loop
-	if (shouldLoop)
+	/*if (shouldLoop)
 		alSourcei(sourceId, AL_LOOPING, AL_TRUE);
 
 	// Set the source pitch value.
 	alSourcef(sourceId, AL_PITCH, pitch);
 
-	ALenum error = alGetError();
+	error = alGetError();
 	if (error != AL_NO_ERROR)
 	{
 		reportOpenALError(error);
@@ -321,7 +397,7 @@ bool SoundManager::playSource(ALuint sourceId, float pitch, float gain, bool sho
 		reportOpenALError(error);
 		return false;
 	}
-
+*/
 	// Play the source.
 	alSourcePlay(sourceId);
 
@@ -335,27 +411,27 @@ bool SoundManager::playSource(ALuint sourceId, float pitch, float gain, bool sho
 	return true;
 
 }
+/*
+ bool SoundManager::playSquareTone()
+ {
 
-bool SoundManager::playSquareTone()
-{
+ //Create a sound buffer with a Saw tone in it
+ ALuint bufferId = alutCreateBufferWaveform(ALUT_WAVEFORM_SQUARE, 440.0, 0, 2);
 
-	//Create a sound buffer with a Saw tone in it
-	ALuint bufferId = alutCreateBufferWaveform(ALUT_WAVEFORM_SQUARE, 440.0, 0, 2);
+ //Get the next available source
+ ALuint sourceId = getNextAvailableSourceId();
 
-	//Get the next available source
-	ALuint sourceId = getNextAvailableSourceId();
+ //Attach the buffer to the source
+ if (attachBufferToSource(bufferId, sourceId))
+ {
 
-	//Attach the buffer to the source
-	if (attachBufferToSource(bufferId, sourceId))
-	{
+ //Now play it
+ return playSource(sourceId, 1.0, 0.3, false);
 
-		//Now play it
-		return playSource(sourceId, 1.0, 0.3, false);
+ }
+ else
+ {
+ return false;
+ }
 
-	}
-	else
-	{
-		return false;
-	}
-
-}
+ }*/

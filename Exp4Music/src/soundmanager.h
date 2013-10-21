@@ -75,19 +75,18 @@ public:
 	bool playSquareTone();
 
 	void playGuitar(float pitch, float gain);
+	void loadDrum();
+	void playDrum();
 
 private:
 
-	// Sound buffers (Key: filename, Value: bufferId)
-	QHash<QString, ALuint> mSoundBuffers;
-
 	// Sound sources
-	ALuint mGuitarSourceId, mDrumLoopSourceId;
+	ALuint mGuitarSourceId, mDrumSourceId;
 
-	ALuint mSourceIds[SOUNDMANAGER_MAX_NBR_OF_SOURCES];
+	// Sound buffers
+	ALuint mGuitarBufferId, mDrumBufferId;
 
-	// Map of buffers which have been attached to sources. Key: bufferId, value: sourceId
-	QHash<ALuint, ALuint> mAttachedSourceIds;
+
 
 	/**
 	 * Gets the next available source ID.

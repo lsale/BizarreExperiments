@@ -62,12 +62,12 @@ ApplicationUI::ApplicationUI(bb::cascades::Application *app) :
 	//m_pSoundManager->load(mBassPath);
 
 	//Create a timer for the drum
-	/*m_pDrumTimer = new QTimer();
+	m_pDrumTimer = new QTimer();
 	m_pDrumTimer->setInterval(500);
 
 	//Connect the timeout to playing the drum
 	connect(m_pDrumTimer, SIGNAL(timeout()), this, SLOT(playDrum()));
-*/
+
 	// Create scene document from main.qml asset, the parent is set
 	// to ensure the document gets destroyed properly at shut down.
 	QmlDocument *qml = QmlDocument::create("asset:///main.qml").parent(this);
@@ -90,6 +90,7 @@ ApplicationUI::ApplicationUI(bb::cascades::Application *app) :
 ApplicationUI::~ApplicationUI()
 {
 	delete m_pSoundManager;
+	delete m_pDrumTimer;
 }
 
 void ApplicationUI::playGuitar(float pitch, float gain)
@@ -99,14 +100,9 @@ void ApplicationUI::playGuitar(float pitch, float gain)
 
 void ApplicationUI::loadDrum(){
 
-	if (m_pSoundManager->load(DRUM_PATH)){
-
-		QString debug("Loaded: ");
-		debug.append(DRUM_PATH);
-		qDebug() << "Loaded: " << DRUM_PATH;
-	} else {
-		qDebug() << "Failed to load recording";
-	}
+	qDebug() << "[ApplicationUI] loadDrum - start";
+	m_pSoundManager->loadDrum();
+	qDebug() << "[ApplicationUI] loadDrum - end";
 }
 
 void ApplicationUI::startDrum()
@@ -122,14 +118,14 @@ void ApplicationUI::stopDrum()
 	m_pDrumTimer->stop();
 
 	//Stop the drum from playing
-	m_pSoundManager->stop(DRUM_PATH);
+	//m_pSoundManager->stop(DRUM_PATH);
 	qDebug() << "[ApplicationUI] stopDrum - end";
 }
 
 void ApplicationUI::playDrum()
 {
 	qDebug() << "[ApplicationUI] playDrum - start";
-	m_pSoundManager->play(DRUM_PATH, 1.0, 1.0);
+	m_pSoundManager->playDrum();
 	qDebug() << "[ApplicationUI] playDrum - end";
 }
 

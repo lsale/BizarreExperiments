@@ -21,7 +21,8 @@ Page {
                 if (event.isDown()) {
 
                     //Play the bass note at the current angle
-                    app.playGuitar(convertAccelerometerToPitch(accelSensor.reading.y), convertAccelerometerToGain(accelSensor.reading.z));
+                    app.playGuitar(1.0, 1.0);
+                    //app.playGuitar(convertAccelerometerToPitch(accelSensor.reading.y), convertAccelerometerToGain(accelSensor.reading.z));
                 }
             }
         }
@@ -73,7 +74,7 @@ Page {
             id: accelSensor
             active: true
             alwaysOn: true
-        }/*,
+        },
         AudioRecorder {
             id: recorder
             outputUrl: drumUrl
@@ -85,7 +86,7 @@ Page {
                     app.loadDrum();
                 }
             }
-        }*/
+        }
     ]
     
     function convertAccelerometerToGain(reading)
@@ -96,7 +97,7 @@ Page {
         
         var gain=0;        
         if (reading > -10){
-            gain = (reading + 10) / 40;
+            gain = ((reading + 10) / 40).toFixed(2);
         }
         console.log("[main.qml] convertAccelerometerToGain - gain: "+gain);
         return gain;
