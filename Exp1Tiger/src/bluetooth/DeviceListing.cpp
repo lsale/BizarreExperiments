@@ -52,14 +52,13 @@ void DeviceListing::update()
             char buffer[128];
             const int bufferSize = sizeof(buffer);
 
-            qDebug() << "\nYYYY DeviceListing::update() - checking device";
-
-			bt_rdev_get_friendly_name(nextRemoteDevice, buffer, bufferSize);
-			map["deviceName"] = QString::fromLatin1(buffer);
-			qDebug() << "YYYY DeviceListing::update() - name=" << QString::fromLatin1(buffer);
+            qDebug() << "YYYY DeviceListing::update() - checking device";
 
             if (isAHeartRateMonitor(nextRemoteDevice)) {
                 qDebug() << "YYYY DeviceListing::update() - found an HR device";
+				bt_rdev_get_friendly_name(nextRemoteDevice, buffer, bufferSize);
+				map["deviceName"] = QString::fromLatin1(buffer);
+                qDebug() << "YYYY DeviceListing::update() - name=" << QString::fromLatin1(buffer);
 				bt_rdev_get_address(nextRemoteDevice, buffer);
 				map["deviceAddress"] = QString::fromLatin1(buffer);
 				map["deviceClass"] = QString::number(bt_rdev_get_device_class(nextRemoteDevice, BT_COD_DEVICECLASS));

@@ -47,15 +47,16 @@ class BluetoothHandler: public QObject {
 public:
 	BluetoothHandler(QObject *obj);
 	virtual ~BluetoothHandler();
-	void receiveHrNotifications();
+	bool receiveHrNotifications();
 	void stopHrNotifications();
+	DeviceListing *deviceListing() const;
 
 private:
 	LocalDeviceInfo *_localDeviceInfo;
 	DeviceListing *_deviceListing;
 	RemoteDeviceInfo *_remoteDeviceInfo;
 
-	DeviceListing *deviceListing() const;
+
     LocalDeviceInfo *localDeviceInfo() const;
     RemoteDeviceInfo *remoteDeviceInfo() const;
 

@@ -331,13 +331,13 @@ BluetoothHandler::~BluetoothHandler() {
 	bt_gatt_deinit();
 }
 
-void BluetoothHandler::receiveHrNotifications() {
+bool BluetoothHandler::receiveHrNotifications() {
 
 	qDebug() << "YYYY setting up to receive GATT notifications";
 
 	if (!bt_initialised) {
 		qDebug() << "Bluetooth libraries are not initialised!";
-		return;
+		return false;
 	}
 
 	HrDataContainer* hrdc = HrDataContainer::getInstance();
@@ -359,6 +359,7 @@ void BluetoothHandler::receiveHrNotifications() {
 		qDebug() << "YYYY requested connection to HR service OK";
 	}
 
+	return true;
 }
 
 DeviceListing *BluetoothHandler::deviceListing() const
