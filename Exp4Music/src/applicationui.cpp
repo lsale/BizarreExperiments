@@ -57,17 +57,17 @@ ApplicationUI::ApplicationUI(bb::cascades::Application *app) :
 	m_pSoundManager = new SoundManager();
 
 	//Load the bass note
-	mBassPath = QDir::currentPath();
-	mBassPath.append("/app/native/assets/bass.wav");
-	m_pSoundManager->load(mBassPath);
+	//mBassPath = QDir::currentPath();
+	//mBassPath.append("/app/native/assets/bass.wav");
+	//m_pSoundManager->load(mBassPath);
 
 	//Create a timer for the drum
-	m_pDrumTimer = new QTimer();
+	/*m_pDrumTimer = new QTimer();
 	m_pDrumTimer->setInterval(500);
 
 	//Connect the timeout to playing the drum
 	connect(m_pDrumTimer, SIGNAL(timeout()), this, SLOT(playDrum()));
-
+*/
 	// Create scene document from main.qml asset, the parent is set
 	// to ensure the document gets destroyed properly at shut down.
 	QmlDocument *qml = QmlDocument::create("asset:///main.qml").parent(this);
@@ -92,9 +92,9 @@ ApplicationUI::~ApplicationUI()
 	delete m_pSoundManager;
 }
 
-void ApplicationUI::playBass(float pitch)
+void ApplicationUI::playGuitar(float pitch, float gain)
 {
-	m_pSoundManager->play(this->mBassPath, pitch, 0.8);
+	m_pSoundManager->playGuitar(pitch, gain);
 }
 
 void ApplicationUI::loadDrum(){

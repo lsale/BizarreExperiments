@@ -21,7 +21,7 @@ public:
     ApplicationUI(bb::cascades::Application *app);
     virtual ~ApplicationUI();
 
-    Q_INVOKABLE void playBass(float pitch);
+    Q_INVOKABLE void playGuitar(float pitch, float gain);
     Q_INVOKABLE void loadDrum();
     Q_INVOKABLE void startDrum();
     Q_INVOKABLE void stopDrum();
