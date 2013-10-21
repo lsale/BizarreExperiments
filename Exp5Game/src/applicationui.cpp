@@ -73,8 +73,12 @@ QString ApplicationUI::getIPAddress()
 	QString _IPv4 = "none";
 	foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
 	{
-		qDebug() << "humanReadableName: " << interface.humanReadableName();
-		if(QString::compare(interface.humanReadableName(), "tiw_sta0") == 0)
+
+		qDebug() << "humanReadableName: " << interface.humanReadableName() << " name: " << interface.name();
+
+		//InterfaceFlags flags = interface.flags();
+
+		if(QString::compare(interface.humanReadableName(), "bcm0") == 0)
 		{
 			foreach (const QNetworkAddressEntry &entry, interface.addressEntries())
 			{
