@@ -165,6 +165,7 @@ Page {
             
             Label {
                 text: (heartRate < targetHeartRate) ? "Too slow" : "Good job!"
+                textStyle.color: (heartRate < targetHeartRate) ? Color.Red : Color.Green
                 textStyle.base: SystemDefaults.TextStyles.BigText
                 horizontalAlignment: HorizontalAlignment.Center
                 verticalAlignment: VerticalAlignment.Center
@@ -172,6 +173,8 @@ Page {
                     spaceQuota: 1
                 }
                 textStyle.textAlign: TextAlign.Center
+                textStyle.fontWeight: FontWeight.Bold
+
             }
             Button {
                 text: "Increase target"
