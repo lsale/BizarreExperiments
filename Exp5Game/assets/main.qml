@@ -29,8 +29,11 @@ Page {
         }
         Container{
             id: startSplash
-            minHeight: 768
-            minWidth: 1280
+            minHeight: 720
+            minWidth: 720
+            preferredWidth: mainApp.getDisplayHeight()
+            preferredHeight: mainApp.getDisplayWidth()
+            
             background: Color.Black
             opacity: 0.5
             layout: DockLayout {

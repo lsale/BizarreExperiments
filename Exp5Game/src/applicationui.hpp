@@ -18,16 +18,22 @@ class ApplicationUI : public QObject
 {
     Q_OBJECT
 public:
+
+    //Public member variables
+    int _donScore;
+	int _lucaScore;
+	int _maxScore;
+	bool _hasGameStarted;
+
+	//Public functions
     ApplicationUI(bb::cascades::Application *app);
     virtual ~ApplicationUI();
     void ConnectionEstablished(QString requestType, QString player);
     void setWinnerFlag(bool flagStatus);
     Q_INVOKABLE QString getIPAddress();
     Q_INVOKABLE bool startGame();
-    int _donScore;
-    int _lucaScore;
-    int _maxScore;
-	bool _hasGameStarted;
+    Q_INVOKABLE int getDisplayWidth();
+    Q_INVOKABLE int getDisplayHeight();
 
 
 signals:
@@ -37,6 +43,7 @@ signals:
 private:
     bb::cascades::QmlDocument *_qml;
     bool _hasPlayerWon;
+    int _displayWidth, _displayHeight;
 };
 
 #endif /* ApplicationUI_HPP_ */

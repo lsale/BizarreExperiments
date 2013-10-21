@@ -1,8 +1,8 @@
 APP_NAME = Exp5Game
 
 CONFIG += qt warn_on cascades10
-INCLUDEPATH += /Users/luca/ndk-10.2.0-workspace/HttpLib
+INCLUDEPATH += ../external-libs/HttpLib
 
-LIBS += -L/Users/luca/ndk-10.2.0-workspace/HttpLib/lib -lHttpLib
+LIBS += -L../external-libs/HttpLib/lib -lHttpLib -lbbdevice
 
 include(config.pri)
