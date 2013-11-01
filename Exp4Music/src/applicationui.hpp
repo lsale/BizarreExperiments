@@ -22,17 +22,18 @@ public:
     virtual ~ApplicationUI();
 
     Q_INVOKABLE void playGuitar(float pitch, float gain);
-    Q_INVOKABLE void loadDrum();
-    Q_INVOKABLE void startDrum();
-    Q_INVOKABLE void stopDrum();
+    Q_INVOKABLE void loadSample();
+    //Q_INVOKABLE void playSampleOneShot();
+    //Q_INVOKABLE void playSampleLooped();
+    Q_INVOKABLE void stopSample();
 
 private slots:
-	void playDrum();
+	//void playSample(bool shouldLoop);
 private:
 
 	SoundManager* m_pSoundManager;
 	QString mBassPath;
-	QTimer* m_pDrumTimer;
+	QTimer* m_pSampleTimer;
 
 	QString getSchedulingPolicyDescription(const int policy);
 };

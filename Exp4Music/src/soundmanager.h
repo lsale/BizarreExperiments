@@ -75,16 +75,16 @@ public:
 	bool playSquareTone();
 
 	void playGuitar(float pitch, float gain);
-	void loadDrum();
-	void playDrum();
+	void loadSample(QString samplePath);
+	void playSample();
 
 private:
 
 	// Sound sources
-	ALuint mGuitarSourceId, mDrumSourceId;
+	ALuint mGuitarSourceId, mSampleSourceId;
 
 	// Sound buffers
-	ALuint mGuitarBufferId, mDrumBufferId;
+	ALuint mGuitarBufferId, mSampleBufferId;
 
 
 

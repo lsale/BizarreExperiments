@@ -84,9 +84,20 @@ lupdate_inclusion {
              $$quote($$BASEDIR/../src/*.cc) \
              $$quote($$BASEDIR/../src/*.cpp) \
              $$quote($$BASEDIR/../src/*.cxx) \
+             $$quote($$BASEDIR/../src/bluetooth/*.c) \
+             $$quote($$BASEDIR/../src/bluetooth/*.c++) \
+             $$quote($$BASEDIR/../src/bluetooth/*.cc) \
+             $$quote($$BASEDIR/../src/bluetooth/*.cpp) \
+             $$quote($$BASEDIR/../src/bluetooth/*.cxx) \
              $$quote($$BASEDIR/../assets/*.qml) \
              $$quote($$BASEDIR/../assets/*.js) \
-             $$quote($$BASEDIR/../assets/*.qs)
+             $$quote($$BASEDIR/../assets/*.qs) \
+             $$quote($$BASEDIR/../assets/images/*.qml) \
+             $$quote($$BASEDIR/../assets/images/*.js) \
+             $$quote($$BASEDIR/../assets/images/*.qs) \
+             $$quote($$BASEDIR/../assets/sounds/*.qml) \
+             $$quote($$BASEDIR/../assets/sounds/*.js) \
+             $$quote($$BASEDIR/../assets/sounds/*.qs)
 
     HEADERS +=  $$quote($$BASEDIR/../src/*.h) \
              $$quote($$BASEDIR/../src/*.h++) \

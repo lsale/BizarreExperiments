@@ -11,7 +11,7 @@
 
 using namespace bb::cascades;
 
-#define DRUM_PATH "/accounts/1000/shared/music/drum.wav"
+#define SAMPLE_PATH "/accounts/1000/shared/music/sample.wav"
 
 ApplicationUI::ApplicationUI(bb::cascades::Application *app) :
 		QObject(app)
@@ -61,16 +61,16 @@ ApplicationUI::ApplicationUI(bb::cascades::Application *app) :
 	//mBassPath.append("/app/native/assets/bass.wav");
 	//m_pSoundManager->load(mBassPath);
 
-	//Create a timer for the drum
-	m_pDrumTimer = new QTimer();
-	m_pDrumTimer->setInterval(500);
+	//Create a timer for the sample
+	m_pSampleTimer = new QTimer();
+	m_pSampleTimer->setInterval(500);
 
-	//Connect the timeout to playing the drum
-	connect(m_pDrumTimer, SIGNAL(timeout()), this, SLOT(playDrum()));
+	//Connect the timeout to playing the sample
+	connect(m_pSampleTimer, SIGNAL(timeout()), this, SLOT(playSample()));
 
 	// Create scene document from main.qml asset, the parent is set
 	// to ensure the document gets destroyed properly at shut down.
-	QmlDocument *qml = QmlDocument::create("asset:///main.qml").parent(this);
+	QmlDocument *qml = QmlDocument::create("asset:///main-debug.qml").parent(this);
 
 	// Expose the app object to the qml
 	qml->setContextProperty("app", this);
@@ -78,10 +78,10 @@ ApplicationUI::ApplicationUI(bb::cascades::Application *app) :
 	// Create root object for the UI
 	AbstractPane *root = qml->createRootObject<AbstractPane>();
 
-	//Set the recording path of the drum
+	//Set the recording path of the sample
 	QString recordingUrl("file://");
-	recordingUrl.append(DRUM_PATH);
-	root->setProperty("drumUrl", recordingUrl);
+	recordingUrl.append(SAMPLE_PATH);
+	root->setProperty("sampleUrl", recordingUrl);
 
 	// Set created root object as the application scene
 	app->setScene(root);
@@ -90,7 +90,7 @@ ApplicationUI::ApplicationUI(bb::cascades::Application *app) :
 ApplicationUI::~ApplicationUI()
 {
 	delete m_pSoundManager;
-	delete m_pDrumTimer;
+	delete m_pSampleTimer;
 }
 
 void ApplicationUI::playGuitar(float pitch, float gain)
@@ -98,36 +98,49 @@ void ApplicationUI::playGuitar(float pitch, float gain)
 	m_pSoundManager->playGuitar(pitch, gain);
 }
 
-void ApplicationUI::loadDrum(){
+void ApplicationUI::loadSample(){
 
-	qDebug() << "[ApplicationUI] loadDrum - start";
-	m_pSoundManager->loadDrum();
-	qDebug() << "[ApplicationUI] loadDrum - end";
+	qDebug() << "[ApplicationUI] loadSample - start";
+	m_pSoundManager->loadSample(SAMPLE_PATH);
+	qDebug() << "[ApplicationUI] loadSample - end";
 }
 
-void ApplicationUI::startDrum()
+/*void ApplicationUI::playSample(bool shouldLoop)
 {
-	qDebug() << "[ApplicationUI] startDrum - start";
-	m_pDrumTimer->start();
-	qDebug() << "[ApplicationUI] startDrum - end";
-}
+	qDebug() << "[ApplicationUI] startSample - start";
 
-void ApplicationUI::stopDrum()
+	m_pSoundManager->playSample();
+
+	if (shouldLoop)
+	{
+		//if the timer is already running stop it
+		if (m_pSampleTimer->isActive()){
+			m_pSampleTimer->stop();
+		}
+		//if the sample is currently being played, stop it
+		m_pSoundManager->stop()
+	}
+
+	m_pSampleTimer->start();
+	qDebug() << "[ApplicationUI] startSample - end";
+}*/
+
+void ApplicationUI::stopSample()
 {
-	qDebug() << "[ApplicationUI] stopDrum - start";
-	m_pDrumTimer->stop();
+	qDebug() << "[ApplicationUI] stopSample - start";
+	m_pSampleTimer->stop();
 
-	//Stop the drum from playing
-	//m_pSoundManager->stop(DRUM_PATH);
-	qDebug() << "[ApplicationUI] stopDrum - end";
+	//Stop the sample from playing
+	//m_pSoundManager->stop(SAMPLE_PATH);
+	qDebug() << "[ApplicationUI] stopSample - end";
 }
 
-void ApplicationUI::playDrum()
+/*void ApplicationUI::playSample()
 {
-	qDebug() << "[ApplicationUI] playDrum - start";
-	m_pSoundManager->playDrum();
-	qDebug() << "[ApplicationUI] playDrum - end";
-}
+	qDebug() << "[ApplicationUI] playSample - start";
+
+	qDebug() << "[ApplicationUI] playSample - end";
+}*/
 
 QString ApplicationUI::getSchedulingPolicyDescription(const int policy) {
 
