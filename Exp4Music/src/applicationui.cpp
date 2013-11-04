@@ -20,39 +20,6 @@ ApplicationUI::ApplicationUI(bb::cascades::Application *app) :
 	//Stop the screen from timing out
 	app->mainWindow()->setScreenIdleMode(ScreenIdleMode::KeepAwake);
 
-	//Read the current scheduling parameters
-	sched_param schedParam;
-	int policy;
-	int getParamsResult = pthread_getschedparam(pthread_self(), &policy, &schedParam);
-
-	if (getParamsResult == EOK)
-	{
-		qDebug() << getSchedulingPolicyDescription(policy);
-	}
-
-	//Change the thread scheduling policy to FIFO
-	int setScheduleResult = pthread_setschedparam(pthread_self(), SCHED_FIFO, &schedParam);
-	if (setScheduleResult == EOK)
-	{
-		qDebug() << "Set scheduler to FIFO";
-	}
-	else
-	{
-		qDebug() << "Error setting scheduling policy to FIFO. Error: " << setScheduleResult;
-	}
-
-	//Change the thread priority to the maximum permissible
-	int priorityResult = pthread_setschedprio(pthread_self(), 63);
-
-	if (priorityResult == EOK)
-	{
-		qDebug() << "Successfully set new thread priority";
-	}
-	else
-	{
-		qDebug() << "Failed to set new thread priority. Result: " << priorityResult;
-	}
-
 	//Initialise our sound manager, which will play our sounds for us
 	m_pSoundManager = new SoundManager();
 
@@ -105,42 +72,35 @@ void ApplicationUI::loadSample(){
 	qDebug() << "[ApplicationUI] loadSample - end";
 }
 
-/*void ApplicationUI::playSample(bool shouldLoop)
+void ApplicationUI::startSampleLoop()
 {
-	qDebug() << "[ApplicationUI] startSample - start";
+	qDebug() << "[ApplicationUI] startSampleLoop - start";
+	playSample();
 
-	m_pSoundManager->playSample();
-
-	if (shouldLoop)
-	{
-		//if the timer is already running stop it
-		if (m_pSampleTimer->isActive()){
-			m_pSampleTimer->stop();
-		}
-		//if the sample is currently being played, stop it
-		m_pSoundManager->stop()
+	if (!m_pSampleTimer->isActive()){
+		m_pSampleTimer->start();
 	}
+	qDebug() << "[ApplicationUI] startSampleLoop - end";
+}
 
-	m_pSampleTimer->start();
-	qDebug() << "[ApplicationUI] startSample - end";
-}*/
+void ApplicationUI::playSample()
+{
+	qDebug() << "[ApplicationUI] playSample - start";
+	m_pSoundManager->playSample();
+	qDebug() << "[ApplicationUI] playSample - end";
+}
 
 void ApplicationUI::stopSample()
 {
 	qDebug() << "[ApplicationUI] stopSample - start";
-	m_pSampleTimer->stop();
+	if (m_pSampleTimer->isActive())
+	{
+		m_pSampleTimer->stop();
+	}
 
-	//Stop the sample from playing
 	//m_pSoundManager->stop(SAMPLE_PATH);
 	qDebug() << "[ApplicationUI] stopSample - end";
 }
-
-/*void ApplicationUI::playSample()
-{
-	qDebug() << "[ApplicationUI] playSample - start";
-
-	qDebug() << "[ApplicationUI] playSample - end";
-}*/
 
 QString ApplicationUI::getSchedulingPolicyDescription(const int policy) {
 

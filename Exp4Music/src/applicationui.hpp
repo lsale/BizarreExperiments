@@ -23,12 +23,12 @@ public:
 
     Q_INVOKABLE void playGuitar(float pitch, float gain);
     Q_INVOKABLE void loadSample();
-    //Q_INVOKABLE void playSampleOneShot();
-    //Q_INVOKABLE void playSampleLooped();
     Q_INVOKABLE void stopSample();
+    Q_INVOKABLE void startSampleLoop();
 
-private slots:
-	//void playSample(bool shouldLoop);
+public slots:
+	Q_INVOKABLE void playSample(); //This is a slot because it's invoked by the timer when looping
+
 private:
 
 	SoundManager* m_pSoundManager;
