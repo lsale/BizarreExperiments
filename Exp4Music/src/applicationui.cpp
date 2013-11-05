@@ -33,7 +33,7 @@ ApplicationUI::ApplicationUI(bb::cascades::Application *app) :
 	m_pSampleTimer->setInterval(500);
 
 	//Connect the timeout to playing the sample
-	connect(m_pSampleTimer, SIGNAL(timeout()), this, SLOT(playSample()));
+	connect(m_pSampleTimer, SIGNAL(timeout()), m_pSoundManager, SLOT(playSample()));
 
 	// Create scene document from main.qml asset, the parent is set
 	// to ensure the document gets destroyed properly at shut down.
@@ -77,9 +77,9 @@ void ApplicationUI::startSampleLoop()
 	qDebug() << "[ApplicationUI] startSampleLoop - start";
 	playSample();
 
-	if (!m_pSampleTimer->isActive()){
-		m_pSampleTimer->start();
-	}
+	//if (!m_pSampleTimer->isActive()){
+	//	m_pSampleTimer->start();
+	//}
 	qDebug() << "[ApplicationUI] startSampleLoop - end";
 }
 
@@ -98,6 +98,7 @@ void ApplicationUI::stopSample()
 		m_pSampleTimer->stop();
 	}
 
+	m_pSoundManager->stopSample();
 	//m_pSoundManager->stop(SAMPLE_PATH);
 	qDebug() << "[ApplicationUI] stopSample - end";
 }

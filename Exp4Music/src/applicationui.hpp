@@ -32,6 +32,7 @@ public slots:
 private:
 
 	SoundManager* m_pSoundManager;
+	SoundManager* m_pSampleSoundManager;
 	QString mBassPath;
 	QTimer* m_pSampleTimer;
 

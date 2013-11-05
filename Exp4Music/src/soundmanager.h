@@ -31,9 +31,10 @@
  *
  * A very basic sound manager class for playing sounds using OpenAL library.
  */
-class SoundManager {
+class SoundManager : public QObject
+{
+	Q_OBJECT
 public:
-
 	/**
 	 * This is our constructor which initializes the sound manager.
 	 *
@@ -68,7 +69,7 @@ public:
 	 * @param filePath Path of file we wish to stop playing
 	 *
 	 */
-	bool stop(QString filePath);
+	bool stop(ALuint sourceId);
 
 	bool setPitch(QString filePath, float newPitch);
 
@@ -76,6 +77,9 @@ public:
 
 	void playGuitar(float pitch, float gain);
 	void loadSample(QString samplePath);
+	void stopSample();
+
+public slots:
 	void playSample();
 
 private:
@@ -85,8 +89,6 @@ private:
 
 	// Sound buffers
 	ALuint mGuitarBufferId, mSampleBufferId;
-
-
 
 	/**
 	 * Gets the next available source ID.
@@ -109,8 +111,6 @@ private:
 	 * @param sourceId the ID of the source
 	 */
 	bool playSource(ALuint sourceId, float pitch, float gain, bool shouldLoop);
-
-
 };
 
 #endif //_SOUNDMANAGER_H

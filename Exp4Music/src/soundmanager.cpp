@@ -1,4 +1,4 @@
-/* Copyright (c) 2012 Research In Motion Limited.
+/* Copyright (c) 2013 Research In Motion Limited.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 #include <qdebug.h>
 
 #define GUITAR_WAV_PATH "/app/native/assets/bass.wav"
-#define SAMPLE_WAV_PATH "/accounts/1000/shared/music/sample.wav"
 
 //Error message functions
 static void reportALUTError(ALenum error)
@@ -239,66 +238,6 @@ void SoundManager::loadSample(QString samplePath)
 	qDebug() << "[SoundManager] loadSample - end";
 }
 
-/*bool SoundManager::load(QString filePath)
- {
-
- bool isSuccessful = false;
-
- //Check to see whether this file has already been loaded
- if (mSoundBuffers.contains(filePath))
- {
-
- ALuint bufferId = mSoundBuffers[filePath];
- ALuint sourceId = mAttachedSourceIds[bufferId];
-
- qDebug() << "XXXX Deleting old source id:" << sourceId << " attached to buffer id:" << bufferId << " for: " << filePath;
-
- //First we need to detach the source from that buffer
- alSourcei(sourceId, AL_BUFFER, 0);
- ALenum error = alGetError();
- if (error != AL_NO_ERROR)
- {
- qDebug() << "XXXX There was a problem detaching source id:" << sourceId << " from buffer id: " << bufferId;
- reportOpenALError(error);
- }
-
- alDeleteBuffers(1, &bufferId);
- error = alGetError();
- if (error != AL_NO_ERROR)
- {
- qDebug() << "XXXX There was a problem deleting buffer id:" << bufferId;
- reportOpenALError(error);
- }
-
- mSoundBuffers.remove(filePath);
- }
-
- //Create a buffer and fill it with data from the WAV file
- ALuint bufferId = alutCreateBufferFromFile(filePath.toStdString().c_str());
-
- if (bufferId != AL_NONE)
- {
-
- qDebug() << "XXXX Created buffer (id: " << bufferId << ") from file for: " << filePath;
-
- //Record the bufferId which this file was loaded into
- mSoundBuffers[filePath] = bufferId;
-
- //Attach this buffer to an available source
- ALuint sourceId = getNextAvailableSourceId();
- isSuccessful = attachBufferToSource(bufferId, sourceId);
-
- }
- else
- {
-
- qDebug() << "XXXX Failed to create buffer for: " << filePath;
- reportALUTError(alutGetError());
- }
-
- return isSuccessful;
- }*/
-
 /*bool SoundManager::play(QString filePath, float pitch, float gain)
  {
 
@@ -310,25 +249,26 @@ void SoundManager::loadSample(QString samplePath)
 
  return playSource(sourceId, pitch, gain, false);
  }*/
-/*
- bool SoundManager::stop(QString filePath)
- {
 
- //Get the buffer and source IDs
- ALuint bufferId = mSoundBuffers[filePath];
- ALuint sourceId = mAttachedSourceIds[bufferId];
+void SoundManager::stopSample()
+{
+	stop(mSampleSourceId);
+}
 
- alSourceStop(sourceId);
+bool SoundManager::stop(ALuint sourceId)
+{
 
- ALenum error = alGetError();
- if (error != AL_NO_ERROR)
- {
- reportOpenALError(error);
- return false;
- }
+	alSourceStop(sourceId);
 
- return true;
- }*/
+	ALenum error = alGetError();
+	if (error != AL_NO_ERROR)
+	{
+		reportOpenALError(error);
+		return false;
+	}
+
+	return true;
+}
 
 /*
  bool SoundManager::setPitch(QString filePath, float newPitch)
@@ -352,51 +292,7 @@ void SoundManager::loadSample(QString samplePath)
  return true;
  }*/
 
-/*
- ALuint SoundManager::getNextAvailableSourceId()
- {
 
- static uint sourceIndex = 0;
-
- //Get the next available source
- ALuint sourceId = mSourceIds[sourceIndex];
-
- //Increment the source index so it points the next available source
- sourceIndex = (sourceIndex + 1) % SOUNDMANAGER_MAX_NBR_OF_SOURCES;
-
- qDebug() << "XXXX Incremented source index, it is now:" << sourceIndex;
-
- return sourceId;
- }
- */
-/*
- bool SoundManager::attachBufferToSource(ALuint bufferId, ALuint sourceId)
- {
-
- bool isSuccessful = false;
-
- qDebug() << "XXXX Attaching buffer to source, id:" << sourceId;
-
- // Attach the buffer the available source.
- alSourcei(sourceId, AL_BUFFER, bufferId);
-
- ALenum error = alGetError();
- if (error == AL_NO_ERROR)
- {
-
- //Store the buffer id with the source id
- mAttachedSourceIds[bufferId] = sourceId;
- isSuccessful = true;
-
- }
- else
- {
- reportOpenALError(error);
- }
-
- return isSuccessful;
- }
- */
 void SoundManager::playGuitar(float pitch, float gain)
 {
 	qDebug() << "[SoundManager] playGuitar - Pitch: " << pitch << " gain: " << gain;
@@ -406,42 +302,47 @@ void SoundManager::playGuitar(float pitch, float gain)
 void SoundManager::playSample()
 {
 	qDebug() << "[SoundManager] playSample - start";
-	playSource(mSampleSourceId, 1.0F, 1.0F, false);
+	playSource(mSampleSourceId, 1.0F, 1.0F, true);
 }
 
 bool SoundManager::playSource(ALuint sourceId, float pitch, float gain, bool shouldLoop)
 {
-
 	qDebug() << "[SoundManager] playSource - Playing source, id: " << sourceId << " pitch: " << pitch << " gain: " << gain << " loop? " << shouldLoop;
 
 	ALenum error;
 	//Set the source to loop
-	/*if (shouldLoop)
-	 alSourcei(sourceId, AL_LOOPING, AL_TRUE);
+	if (shouldLoop)
+		alSourcei(sourceId, AL_LOOPING, AL_TRUE);
 
-	 // Set the source pitch value.
-	 alSourcef(sourceId, AL_PITCH, pitch);
+	// Set the source pitch value.
+	alSourcef(sourceId, AL_PITCH, pitch);
 
-	 error = alGetError();
-	 if (error != AL_NO_ERROR)
-	 {
-	 reportOpenALError(error);
-	 return false;
-	 }
+	error = alGetError();
+	if (error != AL_NO_ERROR)
+	{
+		reportOpenALError(error);
+		return false;
+	}
 
-	 // Set the source gain value.
-	 alSourcef(sourceId, AL_GAIN, gain);
+	// Set the source gain value.
+	alSourcef(sourceId, AL_GAIN, gain);
 
-	 error = alGetError();
-	 if (error != AL_NO_ERROR)
-	 {
-	 reportOpenALError(error);
-	 return false;
-	 }
-	 */
+	error = alGetError();
+	if (error != AL_NO_ERROR)
+	{
+		reportOpenALError(error);
+		return false;
+	}
+	alSourceRewind(sourceId);
+	qDebug() << "[SoundManager] playSource - Rewinding the source";
+	error = alGetError();
+	if (error != AL_NO_ERROR)
+	{
+		reportOpenALError(error);
+	}
+
 	// Play the source.
 	alSourcePlay(sourceId);
-
 	error = alGetError();
 	if (error != AL_NO_ERROR)
 	{
@@ -452,27 +353,3 @@ bool SoundManager::playSource(ALuint sourceId, float pitch, float gain, bool sho
 	return true;
 
 }
-/*
- bool SoundManager::playSquareTone()
- {
-
- //Create a sound buffer with a Saw tone in it
- ALuint bufferId = alutCreateBufferWaveform(ALUT_WAVEFORM_SQUARE, 440.0, 0, 2);
-
- //Get the next available source
- ALuint sourceId = getNextAvailableSourceId();
-
- //Attach the buffer to the source
- if (attachBufferToSource(bufferId, sourceId))
- {
-
- //Now play it
- return playSource(sourceId, 1.0, 0.3, false);
-
- }
- else
- {
- return false;
- }
-
- }*/

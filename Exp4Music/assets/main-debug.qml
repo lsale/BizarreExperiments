@@ -1,12 +1,15 @@
 import bb.cascades 1.0
 import bb.multimedia 1.0
-import QtMobility.sensors 1.2
+import QtMobility.sensors 1.3
 
 Page {
 
     property string sampleUrl
-    property bool isRecording: (audioRecorder.mediaState == MediaState.Started)
-    property bool isPlaying: false
+    property bool isGuitarPlaying: false
+    
+    property bool isSampleRecording: (audioRecorder.mediaState == MediaState.Started)
+    property bool isSamplePlaying: false
+    
 
     Container {
 
@@ -22,10 +25,15 @@ Page {
                     }*/
                 }
             },
+            MediaPlayer {
+                id: audioPlayer
+                sourceUrl: sampleUrl
+                repeatMode: RepeatMode.All
+            },
             Accelerometer {
                 id: accelSensor
                 active: true
-                alwaysOn: true
+                skipDuplicates: true
             }
         ]
 
@@ -33,13 +41,16 @@ Page {
             title: "Guitar"
         }
         Label {
-            text: "Status: " + ((isPlaying) ? "Playing" : "Stopped")
+            text: "Status: " + ((isGuitarPlaying) ? "Playing" : "Stopped")
         }
         Button {
             text: "Strum guitar"
-            onClicked: //Play the bass note at the current angle
-            app.playGuitar(1.0, 1.0);
-            //app.playGuitar(convertAccelerometerToPitch(accelSensor.reading.y), convertAccelerometerToGain(accelSensor.reading.z));
+            onTouch: {
+                if (event.isDown()){
+                    //app.playGuitar(1.0, 1.0);
+                    app.playGuitar(convertAccelerometerToPitch(accelSensor.reading.y), convertAccelerometerToGain(accelSensor.reading.z));
+                }
+            }
             horizontalAlignment: HorizontalAlignment.Center
         }
 
@@ -47,14 +58,16 @@ Page {
             title: "Sampler"
         }
         Label {
-            text: "Status: " + ((isRecording) ? "Recording" : "Stopped")
+            text: "Status: " + ((isSampleRecording) ? "Recording" : "Stopped")
         }
         Button {
-            text: (isRecording) ? "Stop" : "Record sample"
+            text: (isSampleRecording) ? "Stop" : "Record sample"
             onClicked: {
-                if (isRecording) {
+                if (isSampleRecording) {
                     audioRecorder.reset();
                     app.loadSample(); //Load the sample into OpenAL
+                    //audioPlayer.reset();
+                    
                 } else {
                     audioRecorder.record()
                 }
@@ -62,14 +75,27 @@ Page {
             horizontalAlignment: HorizontalAlignment.Center
         }
         CheckBox {
+            id: chkLooped
             text: "Play looped?"
         }
         Button {
-            text: (isPlaying) ? "Stop" : "Play sample"
+            text: (isSamplePlaying) ? "Stop" : "Play sample"
             horizontalAlignment: HorizontalAlignment.Center
-            enabled: (! isRecording)
+            enabled: (!isSampleRecording)
             onClicked: {
-                //(isPlaying) ? audioPlayer.stop() : audioPlayer.play()
+                if (isSamplePlaying){
+                    app.stopSample();
+                } else {
+                    
+                    //audioPlayer.play();
+                    
+                    if (chkLooped.checked){
+                        app.startSampleLoop();
+                    } else {
+                        app.playSample();
+                    }
+                }
+                isSamplePlaying  = !isSamplePlaying;
             }
         }
     }
