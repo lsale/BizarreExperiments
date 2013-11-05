@@ -70,40 +70,16 @@ public:
 	 *
 	 */
 	bool stop(ALuint sourceId);
-
 	bool setPitch(QString filePath, float newPitch);
-
-	bool playSquareTone();
-
 	void playGuitar(float pitch, float gain);
-	void loadSample(QString samplePath);
-	void stopSample();
-
-public slots:
-	void playSample();
 
 private:
 
 	// Sound sources
-	ALuint mGuitarSourceId, mSampleSourceId;
+	ALuint mGuitarSourceId;
 
 	// Sound buffers
-	ALuint mGuitarBufferId, mSampleBufferId;
-
-	/**
-	 * Gets the next available source ID.
-	 *
-	 * @return sourceId
-	 */
-	ALuint getNextAvailableSourceId();
-
-	/**
-	 * Attach a buffer to a source.
-	 *
-	 * @param bufferId the ID of the buffer
-	 * @param sourceId the ID of the source
-	 */
-	bool attachBufferToSource(ALuint bufferId, ALuint sourceId);
+	ALuint mGuitarBufferId;
 
 	/**
 	 * Play the given source

@@ -40,8 +40,6 @@ SoundManager::SoundManager()
 
 	qDebug() << "[SoundManager] Constructor - start";
 
-	mSampleBufferId = 0;
-
 	// Initialize the ALUT
 	if (alutInit(NULL, NULL) == false)
 	{
@@ -50,8 +48,7 @@ SoundManager::SoundManager()
 
 	// Generate 2 sources, one for the guitar and one for the sample loop
 	alGenSources(1, &mGuitarSourceId);
-	alGenSources(1, &mSampleSourceId);
-	qDebug() << "[SoundManager] Constructor - Created sources for guitar and sample";
+	qDebug() << "[SoundManager] Constructor - Created source for guitar";
 
 	// Preload the guitar sound
 	QString guitarPath = QDir::currentPath();
@@ -99,22 +96,8 @@ SoundManager::~SoundManager()
 		reportOpenALError(error);
 	}
 
-	alDeleteSources(1, &mSampleSourceId);
-	error = alGetError();
-	if (error != AL_NO_ERROR)
-	{
-		reportOpenALError(error);
-	}
-
 	//Delete the buffers
 	alDeleteBuffers(1, &mGuitarBufferId);
-	error = alGetError();
-	if (error != AL_NO_ERROR)
-	{
-		reportOpenALError(error);
-	}
-
-	alDeleteBuffers(1, &mSampleBufferId);
 	error = alGetError();
 	if (error != AL_NO_ERROR)
 	{
@@ -128,131 +111,6 @@ SoundManager::~SoundManager()
 	}
 
 	qDebug() << "[SoundManager] Destructor - end";
-
-}
-
-void SoundManager::loadSample(QString samplePath)
-{
-	qDebug() << "[SoundManager] loadSample - start";
-
-	ALenum error;
-
-	if (mSampleBufferId != 0)
-	{
-		qDebug() << "[SoundManager] loadSample - Buffer already exists, id: " << mSampleBufferId;
-
-		qDebug() << "[SoundManager] loadSample - Stopping source, id: " << mSampleSourceId;
-		alSourceStop(mSampleSourceId);
-		error = alGetError();
-		if (error == AL_NO_ERROR)
-		{
-			qDebug() << "[SoundManager] loadSample - Stopped source id: " << mSampleSourceId;
-		}
-		else
-		{
-			reportOpenALError(error);
-		}
-
-		ALint count;
-		qDebug() << "[SoundManager] loadSample - Counting processed buffers";
-
-		alGetSourcei(mSampleSourceId, AL_BUFFERS_PROCESSED, &count);
-		if (error == AL_NO_ERROR)
-		{
-			qDebug() << "[SoundManager] loadSample - Got processed buffer count: " << count;
-
-			if (count > 0)
-			{
-				qDebug() << "[SoundManager] loadSample - Unqueuing buffer";
-
-				//We already have a buffer, unqueue it from the source
-				alSourceUnqueueBuffers(mSampleSourceId, 1, &mSampleBufferId);
-				error = alGetError();
-				if (error == AL_NO_ERROR)
-				{
-					qDebug() << "[SoundManager] loadSample - Unqueued buffer id: " << mSampleBufferId;
-				}
-				else
-				{
-					reportOpenALError(error);
-				}
-			}
-		}
-		else
-		{
-			reportOpenALError(error);
-		}
-
-		//Detach the buffer from the source
-		qDebug() << "[SoundManager] loadSample - Setting source id: " << mSampleSourceId << " to have null buffer";
-
-		alSourcei(mSampleSourceId, AL_BUFFER, AL_NONE);
-		if (error == AL_NO_ERROR)
-		{
-			qDebug() << "[SoundManager] loadSample - Source id: " << mSampleSourceId << " now has null buffer";
-		}
-		else
-		{
-			reportOpenALError(error);
-		}
-
-		qDebug() << "[SoundManager] loadSample - Deleting buffer id: " << mSampleBufferId;
-		alDeleteBuffers(1, &mSampleBufferId);
-
-		if (error == AL_NO_ERROR)
-		{
-			qDebug() << "[SoundManager] loadSample - Buffer deleted";
-		}
-		else
-		{
-			reportOpenALError(error);
-		}
-	}
-
-	//Create a new buffer from the sample wav file
-	qDebug() << "[SoundManager] loadSample - Attempting to create buffer for sample file: " << samplePath;
-	mSampleBufferId = alutCreateBufferFromFile(samplePath.toStdString().c_str());
-
-	error = alutGetError();
-	if (error == AL_NO_ERROR)
-	{
-		qDebug() << "[SoundManager] loadSample - Created buffer, id: " << mSampleBufferId;
-	}
-	else
-	{
-		reportALUTError(error);
-	}
-
-	//Attach the new buffer to the sample source
-	alSourceQueueBuffers(mSampleSourceId, 1, &mSampleBufferId);
-	error = alGetError();
-	if (error == AL_NO_ERROR)
-	{
-		qDebug() << "[SoundManager] loadSample - Queued buffer id: " << mSampleBufferId << " onto the sample source";
-	}
-	else
-	{
-		reportOpenALError(error);
-	}
-
-	qDebug() << "[SoundManager] loadSample - end";
-}
-
-/*bool SoundManager::play(QString filePath, float pitch, float gain)
- {
-
- qDebug() << "XXXX Attempting to play file: " << filePath;
-
- //Get the buffer and source IDs
- ALuint bufferId = mSoundBuffers[filePath];
- ALuint sourceId = mAttachedSourceIds[bufferId];
-
- return playSource(sourceId, pitch, gain, false);
- }*/
-
-void SoundManager::stopSample()
-{
-	stop(mSampleSourceId);
 }
 
 bool SoundManager::stop(ALuint sourceId)
@@ -270,39 +128,10 @@ bool SoundManager::stop(ALuint sourceId)
 	return true;
 }
 
-/*
- bool SoundManager::setPitch(QString filePath, float newPitch)
- {
-
- //Get the buffer and source IDs
- ALuint bufferId = mSoundBuffers[filePath];
- ALuint sourceId = mAttachedSourceIds[bufferId];
-
- qDebug() << "Attempting to change pitch of buffer ID: " << bufferId << " attached to source ID: " << sourceId;
-
- alSourcef(sourceId, AL_PITCH, newPitch);
-
- ALenum error = alGetError();
- if (error != AL_NO_ERROR)
- {
- reportOpenALError(error);
- return false;
- }
-
- return true;
- }*/
-
-
 void SoundManager::playGuitar(float pitch, float gain)
 {
 	qDebug() << "[SoundManager] playGuitar - Pitch: " << pitch << " gain: " << gain;
 	playSource(mGuitarSourceId, pitch, gain, false);
-}
-
-void SoundManager::playSample()
-{
-	qDebug() << "[SoundManager] playSample - start";
-	playSource(mSampleSourceId, 1.0F, 1.0F, true);
 }
 
 bool SoundManager::playSource(ALuint sourceId, float pitch, float gain, bool shouldLoop)
@@ -332,13 +161,6 @@ bool SoundManager::playSource(ALuint sourceId, float pitch, float gain, bool sho
 	{
 		reportOpenALError(error);
 		return false;
-	}
-	alSourceRewind(sourceId);
-	qDebug() << "[SoundManager] playSource - Rewinding the source";
-	error = alGetError();
-	if (error != AL_NO_ERROR)
-	{
-		reportOpenALError(error);
 	}
 
 	// Play the source.
