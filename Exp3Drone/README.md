@@ -29,8 +29,8 @@ TBC
 
 Dependent libraries
 ---
-- *ffmpeg* - https://github.com/MartinMReed/libffbb
-- *x264* - http://supportforums.blackberry.com/t5/Native-Development/Porting-libraries-x264/td-p/2627211
+- **ffmpeg** - https://github.com/MartinMReed/libffbb
+- **x264** - http://supportforums.blackberry.com/t5/Native-Development/Porting-libraries-x264/td-p/2627211
 
 
 
